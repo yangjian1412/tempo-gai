@@ -4,6 +4,9 @@ import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.app.TaskStackBuilder
 import android.content.Intent
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.media3.cast.CastPlayer
 import androidx.media3.cast.SessionAvailabilityListener
 import androidx.media3.common.AudioAttributes
@@ -18,6 +21,10 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession.ControllerInfo
 import com.cappielloantonio.tempo.repository.AutomotiveRepository
+import com.cappielloantonio.tempo.repository.OpenRepository
+import com.cappielloantonio.tempo.repository.OpenRepository.LyricsCallback
+import com.cappielloantonio.tempo.subsonic.models.Child
+import com.cappielloantonio.tempo.subsonic.models.LyricsList
 import com.cappielloantonio.tempo.ui.activity.MainActivity
 import com.cappielloantonio.tempo.util.Constants
 import com.cappielloantonio.tempo.util.DownloadUtil
@@ -30,18 +37,106 @@ import com.google.android.gms.common.GoogleApiAvailability
 @UnstableApi
 class MediaService : MediaLibraryService(), SessionAvailabilityListener {
     private lateinit var automotiveRepository: AutomotiveRepository
+    private lateinit var openRepository: OpenRepository
     private lateinit var player: ExoPlayer
     private lateinit var castPlayer: CastPlayer
     private lateinit var mediaLibrarySession: MediaLibrarySession
 
+    private var currentLyrics: String? = null
+    private var currentLyricsList: LyricsList? = null
+    private val handler = Handler(Looper.getMainLooper())
+    private var updateLyricsNotificationRunnable: Runnable? = null
+    private var lastInjectedLyricLine: String? = null
+    private var lastInjectedSongId: String? = null
+
+    companion object {
+        private var instance: MediaService? = null
+
+        fun getInstance(): MediaService? = instance
+
+        @JvmStatic
+        fun updateLyrics(lyrics: String?, lyricsList: LyricsList?) {
+            instance?.apply {
+                currentLyrics = lyrics
+                currentLyricsList = lyricsList
+            }
+        }
+
+        @JvmStatic
+        fun isPlaying(): Boolean = instance?.player?.isPlaying == true
+
+        @JvmStatic
+        fun play() {
+            instance?.player?.play()
+        }
+
+        @JvmStatic
+        fun pause() {
+            instance?.player?.pause()
+        }
+
+        @JvmStatic
+        fun seekToPrevious() {
+            instance?.player?.seekToPrevious()
+        }
+
+        @JvmStatic
+        fun seekToNext() {
+            instance?.player?.seekToNext()
+        }
+
+        @JvmStatic
+        fun getCurrentPosition(): Long = instance?.player?.currentPosition ?: 0L
+
+        @JvmStatic
+        fun getCurrentMediaItem(): MediaItem? = instance?.player?.currentMediaItem
+
+        @JvmStatic
+        fun getLyricsAtPosition(position: Long): LyricsQuadruple {
+            return instance?.getLyricsLines(position) ?: LyricsQuadruple("", "", "", "")
+        }
+
+        @JvmStatic
+        fun getDuration(): Long = instance?.player?.duration ?: 0L
+
+        @JvmStatic
+        fun isShuffleEnabled(): Boolean = instance?.player?.shuffleModeEnabled == true
+
+        @JvmStatic
+        fun toggleShuffle() {
+            instance?.player?.let { player ->
+                player.shuffleModeEnabled = !player.shuffleModeEnabled
+            }
+        }
+
+        @JvmStatic
+        fun getRepeatMode(): Int = instance?.player?.repeatMode ?: 0
+
+        @JvmStatic
+        fun toggleRepeat() {
+            instance?.player?.let { player ->
+                player.repeatMode = when (player.repeatMode) {
+                    Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
+                    Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
+                    else -> Player.REPEAT_MODE_OFF
+                }
+            }
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
+
+        instance = this
+
+        NotificationHelper.createNotificationChannel(this)
 
         initializeRepository()
         initializePlayer()
         initializeCastPlayer()
         initializeMediaLibrarySession()
         initializePlayerListener()
+        startLyricsNotificationLoop()
 
         setPlayer(
                 null,
@@ -62,12 +157,191 @@ class MediaService : MediaLibraryService(), SessionAvailabilityListener {
     }
 
     override fun onDestroy() {
+        stopLyricsNotificationLoop()
         releasePlayer()
         super.onDestroy()
     }
 
+    private fun startLyricsNotificationLoop() {
+        updateLyricsNotificationRunnable = object : Runnable {
+            override fun run() {
+                updateLyricsNotification()
+                handler.postDelayed(this, 100)
+            }
+        }
+        handler.post(updateLyricsNotificationRunnable!!)
+    }
+
+    private fun stopLyricsNotificationLoop() {
+        updateLyricsNotificationRunnable?.let { handler.removeCallbacks(it) }
+        updateLyricsNotificationRunnable = null
+    }
+
+    private fun updateLyricsNotification() {
+        if (!::player.isInitialized) return
+
+        val mediaItem = player.currentMediaItem ?: return
+        val isPlaying = player.isPlaying
+        val position = player.currentPosition
+
+        val title = mediaItem.mediaMetadata.title?.toString() ?: "Unknown"
+        val artist = mediaItem.mediaMetadata.artist?.toString() ?: "Unknown Artist"
+
+        val hasLyrics = currentLyricsList?.structuredLyrics?.isNotEmpty() == true
+
+        val (prevLine, currentLine, nextLine1, nextLine2) = if (hasLyrics) {
+            getLyricsLines(position)
+        } else {
+            LyricsQuadruple("", "", "", "")
+        }
+
+        if (Preferences.isLyricsNotificationEnabled()) {
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as android.app.NotificationManager
+            NotificationHelper.showLyricsNotification(
+                this,
+                notificationManager,
+                if (hasLyrics) "" else title,
+                if (hasLyrics) "" else artist,
+                prevLine,
+                currentLine,
+                nextLine1,
+                nextLine2,
+                isPlaying
+            )
+        } else {
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as android.app.NotificationManager
+            NotificationHelper.cancelLyricsNotification(notificationManager)
+        }
+
+        if (Preferences.isDesktopLyricsEnabled() && hasLyrics) {
+            DesktopLyricsOverlay.show(this, currentLine, nextLine1)
+        } else {
+            DesktopLyricsOverlay.hide()
+        }
+
+        if (Preferences.isSystemPlayerLyricsEnabled() && hasLyrics) {
+            injectLyricsIntoMediaSession(currentLine, nextLine1, mediaItem.mediaId)
+        } else {
+            restoreOriginalMetadata(mediaItem.mediaId)
+        }
+    }
+
+    private fun restoreOriginalMetadata(mediaId: String?) {
+        if (lastInjectedLyricLine == null) return
+
+        val currentMediaItem = player.currentMediaItem ?: return
+        val currentIndex = player.currentMediaItemIndex
+        if (currentIndex < 0) return
+
+        val extras = currentMediaItem.mediaMetadata.extras
+        val originalTitle = extras?.getString("original_title")
+        val originalArtist = extras?.getString("original_artist")
+
+        if (originalTitle.isNullOrEmpty()) {
+            lastInjectedLyricLine = null
+            lastInjectedSongId = null
+            return
+        }
+
+        val newMetadata = currentMediaItem.mediaMetadata.buildUpon().apply {
+            setTitle(originalTitle)
+            if (!originalArtist.isNullOrEmpty()) {
+                setArtist(originalArtist)
+            }
+        }.build()
+
+        val newItem = currentMediaItem.buildUpon()
+            .setMediaMetadata(newMetadata)
+            .build()
+
+        try {
+            player.replaceMediaItem(currentIndex, newItem)
+        } catch (_: Exception) {
+        }
+        lastInjectedLyricLine = null
+        lastInjectedSongId = null
+    }
+
+    private fun injectLyricsIntoMediaSession(currentLine: String, nextLine: String, mediaId: String?) {
+        if (currentLine == lastInjectedLyricLine && mediaId == lastInjectedSongId) return
+
+        val currentMediaItem = player.currentMediaItem ?: return
+        val currentIndex = player.currentMediaItemIndex
+        if (currentIndex < 0) return
+
+        val oldExtras = currentMediaItem.mediaMetadata.extras
+        val newExtras = Bundle()
+        if (oldExtras != null) {
+            newExtras.putAll(oldExtras)
+        }
+
+        val originalTitle = newExtras.getString("original_title")
+            ?: currentMediaItem.mediaMetadata.title?.toString().orEmpty()
+        val originalArtist = newExtras.getString("original_artist")
+            ?: currentMediaItem.mediaMetadata.artist?.toString().orEmpty()
+
+        newExtras.putString("original_title", originalTitle)
+        newExtras.putString("original_artist", originalArtist)
+        newExtras.putString("current_lyric", currentLine)
+        newExtras.putString("next_lyric", nextLine)
+        newExtras.putString("lyric_time", player.currentPosition.toString())
+
+        val newMetadataBuilder = currentMediaItem.mediaMetadata.buildUpon()
+            .setTitle(currentLine)
+            .setExtras(newExtras)
+
+        if (originalArtist.isNotEmpty() && originalTitle.isNotEmpty()) {
+            newMetadataBuilder.setArtist("$originalArtist - $originalTitle")
+        } else if (originalArtist.isNotEmpty()) {
+            newMetadataBuilder.setArtist(originalArtist)
+        }
+
+        val newMetadata = newMetadataBuilder.build()
+
+        val newItem = currentMediaItem.buildUpon()
+            .setMediaMetadata(newMetadata)
+            .build()
+
+        try {
+            player.replaceMediaItem(currentIndex, newItem)
+            lastInjectedLyricLine = currentLine
+            lastInjectedSongId = mediaId
+        } catch (_: Exception) {
+        }
+    }
+
+    private fun getLyricsLines(position: Long): LyricsQuadruple {
+        val lyricsList = currentLyricsList ?: return LyricsQuadruple("", "", "", "")
+
+        val structuredLyrics = lyricsList.structuredLyrics
+        if (structuredLyrics.isNullOrEmpty()) return LyricsQuadruple("", "", "", "")
+
+        val lines = structuredLyrics[0].line
+        if (lines.isNullOrEmpty()) return LyricsQuadruple("", "", "", "")
+
+        var currentIndex = -1
+        for (i in lines.indices) {
+            val startTime = lines[i].start
+            if (startTime != null && startTime <= position) {
+                currentIndex = i
+            } else {
+                break
+            }
+        }
+
+        val prevLine = if (currentIndex > 0) lines[currentIndex - 1].value?.trim() ?: "" else ""
+        val currentLine = if (currentIndex >= 0) lines[currentIndex].value?.trim() ?: "" else ""
+        val nextLine1 = if (currentIndex + 1 < lines.size) lines[currentIndex + 1].value?.trim() ?: "" else ""
+        val nextLine2 = if (currentIndex + 2 < lines.size) lines[currentIndex + 2].value?.trim() ?: "" else ""
+
+        return LyricsQuadruple(prevLine, currentLine, nextLine1, nextLine2)
+    }
+
+    data class LyricsQuadruple(val prev: String, val current: String, val next1: String, val next2: String)
+
     private fun initializeRepository() {
         automotiveRepository = AutomotiveRepository()
+        openRepository = OpenRepository()
     }
 
     private fun initializePlayer() {
@@ -112,9 +386,42 @@ class MediaService : MediaLibraryService(), SessionAvailabilityListener {
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                 if (mediaItem == null) return
 
+                if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED) {
+                    return
+                }
+
                 if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK || reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
                     MediaManager.setLastPlayedTimestamp(mediaItem)
                 }
+
+                currentLyrics = null
+                currentLyricsList = null
+                lastInjectedLyricLine = null
+                lastInjectedSongId = null
+
+                val songId = mediaItem.mediaMetadata.extras?.getString("id")
+                if (songId != null) {
+                    openRepository.getLyricsBySongId(songId, object : OpenRepository.LyricsCallback {
+                        override fun onSuccess(lyricsList: LyricsList) {
+                            currentLyricsList = lyricsList
+                        }
+
+                        override fun onFailure() {
+                        }
+                    })
+                }
+
+                val notificationManager = this@MediaService.getSystemService(NOTIFICATION_SERVICE) as android.app.NotificationManager
+                val title = mediaItem.mediaMetadata.title?.toString() ?: "Unknown"
+                val artist = mediaItem.mediaMetadata.artist?.toString() ?: "Unknown Artist"
+                NotificationHelper.showLyricsNotification(
+                    this@MediaService,
+                    notificationManager,
+                    title,
+                    artist,
+                    "", "", "", "",
+                    player.isPlaying
+                )
             }
 
             override fun onTracksChanged(tracks: Tracks) {

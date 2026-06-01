@@ -37,6 +37,52 @@
             android:key="always_on_display" />
 
         <SwitchPreference
+            android:title="@string/settings_lyrics_notification_title"
+            android:defaultValue="false"
+            android:summary="@string/settings_lyrics_notification_summary"
+            android:key="lyrics_notification" />
+
+        <SwitchPreference
+            android:title="@string/settings_desktop_lyrics_title"
+            android:defaultValue="false"
+            android:summary="@string/settings_desktop_lyrics_summary"
+            android:key="desktop_lyrics" />
+
+        <SwitchPreference
+            android:title="@string/settings_system_player_lyrics_title"
+            android:defaultValue="false"
+            android:summary="@string/settings_system_player_lyrics_summary"
+            android:key="system_player_lyrics" />
+
+        <ListPreference
+            app:defaultValue="1"
+            app:dialogTitle="@string/settings_desktop_lyrics_font_size_title"
+            app:entries="@array/desktop_lyrics_font_size_titles"
+            app:entryValues="@array/desktop_lyrics_font_size_values"
+            app:key="desktop_lyrics_font_size"
+            app:title="@string/settings_desktop_lyrics_font_size_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="0"
+            app:dialogTitle="@string/settings_desktop_lyrics_color_title"
+            app:entries="@array/desktop_lyrics_color_titles"
+            app:entryValues="@array/desktop_lyrics_color_values"
+            app:key="desktop_lyrics_color"
+            app:title="@string/settings_desktop_lyrics_color_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <SeekBarPreference
+            android:key="desktop_lyrics_bg_alpha"
+            android:defaultValue="50"
+            android:min="0"
+            android:max="100"
+            app:seekBarIncrement="5"
+            app:showSeekBarValue="true"
+            app:summary="0-100%"
+            app:title="@string/settings_desktop_lyrics_bg_alpha_title" />
+
+        <SwitchPreference
             android:title="@string/settings_rounded_corner"
             android:defaultValue="true"
             android:summary="@string/settings_rounded_corner_summary"

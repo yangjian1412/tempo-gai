@@ -13,3 +13,9 @@
 .externalNativeBuild
 .cxx
 /.idea/
+
+# Build artifacts (tempo-gai)
+app-tempo-debug-backup.apk
+*.apk
+app/build/
+**/build/

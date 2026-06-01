@@ -1,9 +1,12 @@
 package com.cappielloantonio.tempo.ui.fragment;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.media.audiofx.AudioEffect;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -98,6 +101,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         actionChangeStreamingCacheStorage();
         actionChangeDownloadStorage();
         actionDeleteDownloadStorage();
+        actionDesktopLyrics();
         actionKeepScreenOn();
     }
 
@@ -323,5 +327,40 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             }
             return true;
         });
+    }
+
+    private void actionDesktopLyrics() {
+        findPreference("desktop_lyrics").setOnPreferenceChangeListener((preference, newValue) -> {
+            if (newValue instanceof Boolean) {
+                if ((Boolean) newValue) {
+                    if (!SettingsFragment.this.hasOverlayPermission()) {
+                        SettingsFragment.this.requestOverlayPermission();
+                        return false;
+                    }
+                } else {
+                    com.cappielloantonio.tempo.service.DesktopLyricsOverlay.hide();
+                }
+            }
+            return true;
+        });
+    }
+
+    private boolean hasOverlayPermission() {
+        return android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M && android.provider.Settings.canDrawOverlays(requireContext());
+    }
+
+    private void requestOverlayPermission() {
+        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:" + requireContext().getPackageName()));
+        try {
+            someActivityResultLauncher.launch(intent);
+        } catch (ActivityNotFoundException e) {
+            try {
+                Intent fallback = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.parse("package:" + requireContext().getPackageName()));
+                someActivityResultLauncher.launch(fallback);
+            } catch (ActivityNotFoundException ignored) {
+            }
+        }
     }
 }

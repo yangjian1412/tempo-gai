@@ -64,6 +64,13 @@ object Preferences {
     private const val NEXT_UPDATE_CHECK = "next_update_check"
     private const val CONTINUOUS_PLAY = "continuous_play"
     private const val LAST_INSTANT_MIX = "last_instant_mix"
+    private const val LYRICS_NOTIFICATION = "lyrics_notification"
+    private const val DESKTOP_LYRICS = "desktop_lyrics"
+    private const val SYSTEM_PLAYER_LYRICS = "system_player_lyrics"
+    private const val DESKTOP_LYRICS_FONT_SIZE = "desktop_lyrics_font_size"
+    private const val DESKTOP_LYRICS_COLOR = "desktop_lyrics_color"
+    private const val DESKTOP_LYRICS_BG_ALPHA = "desktop_lyrics_bg_alpha"
+    private const val DESKTOP_LYRICS_POSITION = "desktop_lyrics_position"
 
 
     @JvmStatic
@@ -495,5 +502,93 @@ object Preferences {
         return App.getInstance().preferences.getLong(
                 LAST_INSTANT_MIX, 0
         ) + 5000 < System.currentTimeMillis()
+    }
+
+    @JvmStatic
+    fun isLyricsNotificationEnabled(): Boolean {
+        return App.getInstance().preferences.getBoolean(LYRICS_NOTIFICATION, false)
+    }
+
+    @JvmStatic
+    fun setLyricsNotificationEnabled(enabled: Boolean) {
+        App.getInstance().preferences.edit().putBoolean(LYRICS_NOTIFICATION, enabled).apply()
+    }
+
+    @JvmStatic
+    fun isDesktopLyricsEnabled(): Boolean {
+        return App.getInstance().preferences.getBoolean(DESKTOP_LYRICS, false)
+    }
+
+    @JvmStatic
+    fun setDesktopLyricsEnabled(enabled: Boolean) {
+        App.getInstance().preferences.edit().putBoolean(DESKTOP_LYRICS, enabled).apply()
+    }
+
+    @JvmStatic
+    fun isSystemPlayerLyricsEnabled(): Boolean {
+        return App.getInstance().preferences.getBoolean(SYSTEM_PLAYER_LYRICS, false)
+    }
+
+    @JvmStatic
+    fun setSystemPlayerLyricsEnabled(enabled: Boolean) {
+        App.getInstance().preferences.edit().putBoolean(SYSTEM_PLAYER_LYRICS, enabled).apply()
+    }
+
+    @JvmStatic
+    fun getDesktopLyricsFontSize(): Int {
+        return try {
+            App.getInstance().preferences.getInt(DESKTOP_LYRICS_FONT_SIZE, 1)
+        } catch (e: Exception) {
+            1
+        }
+    }
+
+    @JvmStatic
+    fun setDesktopLyricsFontSize(size: Int) {
+        App.getInstance().preferences.edit().putInt(DESKTOP_LYRICS_FONT_SIZE, size).apply()
+    }
+
+    @JvmStatic
+    fun getDesktopLyricsColor(): Int {
+        return try {
+            val colorStr = App.getInstance().preferences.getString(DESKTOP_LYRICS_COLOR, "0xFFFFFFFF") ?: "0xFFFFFFFF"
+            val cleanStr = colorStr.replace("0x", "").replace("0X", "").trim()
+            cleanStr.toLong(16).toInt()
+        } catch (e: Exception) {
+            0xFFFFFFFF.toInt()
+        }
+    }
+
+    @JvmStatic
+    fun setDesktopLyricsColor(color: Int) {
+        App.getInstance().preferences.edit().putString(DESKTOP_LYRICS_COLOR, "0x" + Integer.toHexString(color)).apply()
+    }
+
+    @JvmStatic
+    fun getDesktopLyricsBgAlpha(): Int {
+        return try {
+            App.getInstance().preferences.getInt(DESKTOP_LYRICS_BG_ALPHA, 50)
+        } catch (e: Exception) {
+            50
+        }
+    }
+
+    @JvmStatic
+    fun setDesktopLyricsBgAlpha(alpha: Int) {
+        App.getInstance().preferences.edit().putInt(DESKTOP_LYRICS_BG_ALPHA, alpha).apply()
+    }
+
+    @JvmStatic
+    fun getDesktopLyricsPosition(): Int {
+        return try {
+            App.getInstance().preferences.getInt(DESKTOP_LYRICS_POSITION, 0)
+        } catch (e: Exception) {
+            0
+        }
+    }
+
+    @JvmStatic
+    fun setDesktopLyricsPosition(position: Int) {
+        App.getInstance().preferences.edit().putInt(DESKTOP_LYRICS_POSITION, position).apply()
     }
 }

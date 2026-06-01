@@ -34,4 +34,30 @@ public class OpenRepository {
 
         return lyricsList;
     }
+
+    public void getLyricsBySongId(String id, LyricsCallback callback) {
+        App.getSubsonicClientInstance(false)
+                .getOpenClient()
+                .getLyricsBySongId(id)
+                .enqueue(new Callback<ApiResponse>() {
+                    @Override
+                    public void onResponse(@NonNull Call<ApiResponse> call, @NonNull Response<ApiResponse> response) {
+                        if (response.isSuccessful() && response.body() != null && response.body().getSubsonicResponse().getLyricsList() != null) {
+                            callback.onSuccess(response.body().getSubsonicResponse().getLyricsList());
+                        } else {
+                            callback.onFailure();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<ApiResponse> call, @NonNull Throwable t) {
+                        callback.onFailure();
+                    }
+                });
+    }
+
+    public interface LyricsCallback {
+        void onSuccess(LyricsList lyricsList);
+        void onFailure();
+    }
 }

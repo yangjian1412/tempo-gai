@@ -254,4 +254,32 @@
         <item>3</item>
         <item>4</item>
     </string-array>
+
+    <string-array name="desktop_lyrics_font_size_titles">
+        <item>小</item>
+        <item>中</item>
+        <item>大</item>
+    </string-array>
+    <string-array name="desktop_lyrics_font_size_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="desktop_lyrics_color_titles">
+        <item>白色</item>
+        <item>黄色</item>
+        <item>粉色</item>
+        <item>蓝色</item>
+        <item>绿色</item>
+        <item>紫色</item>
+    </string-array>
+    <string-array name="desktop_lyrics_color_values">
+        <item>0xFFFFFFFF</item>
+        <item>0xFFFFFF00</item>
+        <item>0xFFFF69B4</item>
+        <item>0xFF00BFFF</item>
+        <item>0xFF00FF7F</item>
+        <item>0xFFDA70D6</item>
+    </string-array>
 </resources>
