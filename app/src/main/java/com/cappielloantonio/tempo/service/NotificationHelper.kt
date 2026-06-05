@@ -29,10 +29,10 @@ object NotificationHelper {
 
     private const val FONT_SIZE_NOTIFICATION_PREV_NEXT_SMALL = 12f
     private const val FONT_SIZE_NOTIFICATION_CURRENT_SMALL = 14f
-    private const val FONT_SIZE_NOTIFICATION_PREV_NEXT_MEDIUM = 14f
-    private const val FONT_SIZE_NOTIFICATION_CURRENT_MEDIUM = 16f
+    private const val FONT_SIZE_NOTIFICATION_PREV_NEXT_MEDIUM = 15f
+    private const val FONT_SIZE_NOTIFICATION_CURRENT_MEDIUM = 18f
     private const val FONT_SIZE_NOTIFICATION_PREV_NEXT_LARGE = 18f
-    private const val FONT_SIZE_NOTIFICATION_CURRENT_LARGE = 20f
+    private const val FONT_SIZE_NOTIFICATION_CURRENT_LARGE = 21f
 
     fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -106,19 +106,25 @@ object NotificationHelper {
         lyricsView.setOnClickPendingIntent(R.id.notification_lyrics_next2, contentIntent)
 
         val density = context.resources.displayMetrics.scaledDensity
-        val (currentSp, prevNextSp) = when (Preferences.getLyricsNotificationFontSize()) {
-            0 -> FONT_SIZE_NOTIFICATION_CURRENT_SMALL to FONT_SIZE_NOTIFICATION_PREV_NEXT_SMALL
-            2 -> FONT_SIZE_NOTIFICATION_CURRENT_LARGE to FONT_SIZE_NOTIFICATION_PREV_NEXT_LARGE
-            else -> FONT_SIZE_NOTIFICATION_CURRENT_MEDIUM to FONT_SIZE_NOTIFICATION_PREV_NEXT_MEDIUM
+        val (currentSp, prevNextSp, showPrev) = when (Preferences.getLyricsNotificationFontSize()) {
+            0 -> Triple(FONT_SIZE_NOTIFICATION_CURRENT_SMALL, FONT_SIZE_NOTIFICATION_PREV_NEXT_SMALL, false)
+            2 -> Triple(FONT_SIZE_NOTIFICATION_CURRENT_LARGE, FONT_SIZE_NOTIFICATION_PREV_NEXT_LARGE, false)
+            else -> Triple(FONT_SIZE_NOTIFICATION_CURRENT_MEDIUM, FONT_SIZE_NOTIFICATION_PREV_NEXT_MEDIUM, true)
         }
         val currentSizePx = currentSp * density
         val nextSizePx = prevNextSp * density
-        val farNextSizePx = prevNextSp * 0.85f * density
 
         lyricsView.setFloat(R.id.notification_lyrics_prev, "setTextSize", nextSizePx)
         lyricsView.setFloat(R.id.notification_lyrics_current, "setTextSize", currentSizePx)
         lyricsView.setFloat(R.id.notification_lyrics_next1, "setTextSize", nextSizePx)
-        lyricsView.setFloat(R.id.notification_lyrics_next2, "setTextSize", farNextSizePx)
+
+        lyricsView.setViewVisibility(
+            R.id.notification_lyrics_prev,
+            if (showPrev) android.view.View.VISIBLE else android.view.View.GONE
+        )
+        lyricsView.setViewVisibility(R.id.notification_lyrics_next2, android.view.View.GONE)
+        lyricsView.setViewVisibility(R.id.notification_lyrics_current, android.view.View.VISIBLE)
+        lyricsView.setViewVisibility(R.id.notification_lyrics_next1, android.view.View.VISIBLE)
 
         val visibility = if (Preferences.isLyricsNotificationLockScreenEnabled()) {
             NotificationCompat.VISIBILITY_PUBLIC
