@@ -7,7 +7,6 @@ import android.app.PendingIntent
 import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Build
 import android.widget.RemoteViews
 import androidx.annotation.OptIn
@@ -17,6 +16,7 @@ import com.cappielloantonio.tempo.R
 import com.cappielloantonio.tempo.subsonic.models.Line
 import com.cappielloantonio.tempo.subsonic.models.LyricsList
 import com.cappielloantonio.tempo.ui.activity.MainActivity
+import com.cappielloantonio.tempo.util.Preferences
 
 @OptIn(UnstableApi::class)
 object NotificationHelper {
@@ -26,6 +26,13 @@ object NotificationHelper {
     private const val LYRICS_CHANNEL_NAME = "Tempo Lyrics"
     private const val NOTIFICATION_ID = 1
     private const val LYRICS_NOTIFICATION_ID = 2
+
+    private const val FONT_SIZE_NOTIFICATION_PREV_NEXT_SMALL = 12f
+    private const val FONT_SIZE_NOTIFICATION_CURRENT_SMALL = 14f
+    private const val FONT_SIZE_NOTIFICATION_PREV_NEXT_MEDIUM = 14f
+    private const val FONT_SIZE_NOTIFICATION_CURRENT_MEDIUM = 16f
+    private const val FONT_SIZE_NOTIFICATION_PREV_NEXT_LARGE = 18f
+    private const val FONT_SIZE_NOTIFICATION_CURRENT_LARGE = 20f
 
     fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -93,7 +100,27 @@ object NotificationHelper {
             getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         }
 
-        val visibility = if (com.cappielloantonio.tempo.util.Preferences.isLyricsNotificationLockScreenEnabled()) {
+        lyricsView.setOnClickPendingIntent(R.id.notification_lyrics_current, contentIntent)
+        lyricsView.setOnClickPendingIntent(R.id.notification_lyrics_prev, contentIntent)
+        lyricsView.setOnClickPendingIntent(R.id.notification_lyrics_next1, contentIntent)
+        lyricsView.setOnClickPendingIntent(R.id.notification_lyrics_next2, contentIntent)
+
+        val density = context.resources.displayMetrics.scaledDensity
+        val (currentSp, prevNextSp) = when (Preferences.getLyricsNotificationFontSize()) {
+            0 -> FONT_SIZE_NOTIFICATION_CURRENT_SMALL to FONT_SIZE_NOTIFICATION_PREV_NEXT_SMALL
+            2 -> FONT_SIZE_NOTIFICATION_CURRENT_LARGE to FONT_SIZE_NOTIFICATION_PREV_NEXT_LARGE
+            else -> FONT_SIZE_NOTIFICATION_CURRENT_MEDIUM to FONT_SIZE_NOTIFICATION_PREV_NEXT_MEDIUM
+        }
+        val currentSizePx = currentSp * density
+        val nextSizePx = prevNextSp * density
+        val farNextSizePx = prevNextSp * 0.85f * density
+
+        lyricsView.setFloat(R.id.notification_lyrics_prev, "setTextSize", nextSizePx)
+        lyricsView.setFloat(R.id.notification_lyrics_current, "setTextSize", currentSizePx)
+        lyricsView.setFloat(R.id.notification_lyrics_next1, "setTextSize", nextSizePx)
+        lyricsView.setFloat(R.id.notification_lyrics_next2, "setTextSize", farNextSizePx)
+
+        val visibility = if (Preferences.isLyricsNotificationLockScreenEnabled()) {
             NotificationCompat.VISIBILITY_PUBLIC
         } else {
             NotificationCompat.VISIBILITY_SECRET

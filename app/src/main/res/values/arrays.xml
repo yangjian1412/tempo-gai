@@ -273,7 +273,7 @@
     </string-array>
 
     <string-array name="desktop_lyrics_color_titles">
-        <item>白色</item>
+        <item>默认（白色）</item>
         <item>黑色</item>
         <item>红色</item>
         <item>橙色</item>
@@ -310,5 +310,27 @@
         <item>2</item>
         <item>3</item>
         <item>4</item>
+    </string-array>
+
+    <string-array name="desktop_lyrics_alignment_titles">
+        <item>左对齐</item>
+        <item>居中</item>
+        <item>右对齐</item>
+    </string-array>
+    <string-array name="desktop_lyrics_alignment_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="lyrics_notification_font_size_titles">
+        <item>小</item>
+        <item>中</item>
+        <item>大</item>
+    </string-array>
+    <string-array name="lyrics_notification_font_size_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
     </string-array>
 </resources>

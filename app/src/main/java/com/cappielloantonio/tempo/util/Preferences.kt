@@ -66,10 +66,13 @@ object Preferences {
     private const val LAST_INSTANT_MIX = "last_instant_mix"
     private const val LYRICS_NOTIFICATION = "lyrics_notification"
     private const val LYRICS_NOTIFICATION_LOCK_SCREEN = "lyrics_notification_lock_screen"
+    private const val LYRICS_NOTIFICATION_FONT_SIZE = "lyrics_notification_font_size"
     private const val DESKTOP_LYRICS = "desktop_lyrics"
     private const val DESKTOP_LYRICS_FONT_SIZE = "desktop_lyrics_font_size"
     private const val DESKTOP_LYRICS_COLOR = "desktop_lyrics_color"
     private const val DESKTOP_LYRICS_BG_ALPHA = "desktop_lyrics_bg_alpha"
+    private const val DESKTOP_LYRICS_TEXT_ALPHA = "desktop_lyrics_text_alpha"
+    private const val DESKTOP_LYRICS_ALIGNMENT = "desktop_lyrics_alignment"
     private const val DESKTOP_LYRICS_POSITION = "desktop_lyrics_position"
     private const val DESKTOP_LYRICS_LINE_COUNT = "desktop_lyrics_line_count"
     private const val SYSTEM_PLAYER_LYRICS = "system_player_lyrics"
@@ -527,6 +530,20 @@ object Preferences {
     }
 
     @JvmStatic
+    fun getLyricsNotificationFontSize(): Int {
+        return try {
+            App.getInstance().preferences.getString(LYRICS_NOTIFICATION_FONT_SIZE, "1")?.toIntOrNull() ?: 1
+        } catch (e: Exception) {
+            1
+        }
+    }
+
+    @JvmStatic
+    fun setLyricsNotificationFontSize(size: Int) {
+        App.getInstance().preferences.edit().putString(LYRICS_NOTIFICATION_FONT_SIZE, size.toString()).apply()
+    }
+
+    @JvmStatic
     fun isDesktopLyricsEnabled(): Boolean {
         return App.getInstance().preferences.getBoolean(DESKTOP_LYRICS, false)
     }
@@ -588,6 +605,34 @@ object Preferences {
     @JvmStatic
     fun setDesktopLyricsBgAlpha(alpha: Int) {
         App.getInstance().preferences.edit().putInt(DESKTOP_LYRICS_BG_ALPHA, alpha).apply()
+    }
+
+    @JvmStatic
+    fun getDesktopLyricsTextAlpha(): Int {
+        return try {
+            App.getInstance().preferences.getInt(DESKTOP_LYRICS_TEXT_ALPHA, 100)
+        } catch (e: Exception) {
+            100
+        }
+    }
+
+    @JvmStatic
+    fun setDesktopLyricsTextAlpha(alpha: Int) {
+        App.getInstance().preferences.edit().putInt(DESKTOP_LYRICS_TEXT_ALPHA, alpha).apply()
+    }
+
+    @JvmStatic
+    fun getDesktopLyricsAlignment(): Int {
+        return try {
+            App.getInstance().preferences.getString(DESKTOP_LYRICS_ALIGNMENT, "1")?.toIntOrNull() ?: 1
+        } catch (e: Exception) {
+            1
+        }
+    }
+
+    @JvmStatic
+    fun setDesktopLyricsAlignment(alignment: Int) {
+        App.getInstance().preferences.edit().putString(DESKTOP_LYRICS_ALIGNMENT, alignment.toString()).apply()
     }
 
     @JvmStatic

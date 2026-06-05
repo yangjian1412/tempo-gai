@@ -224,6 +224,8 @@ class MediaService : MediaLibraryService(), SessionAvailabilityListener {
         } else {
             restoreOriginalMetadata(mediaItem.mediaId)
         }
+
+        com.cappielloantonio.tempo.widget.LyricsWidgetUpdater.refresh(this)
     }
 
     private fun restoreOriginalMetadata(mediaId: String?) {

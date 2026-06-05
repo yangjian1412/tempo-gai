@@ -9,5 +9,9 @@
 
     <color name="searchPlaceholderColor">#CFCFCF</color>
     <color name="searchColor">#DADADA</color>
+
+    <color name="widget_background_color">#F2242424</color>
+    <color name="widget_text_primary">#DADADA</color>
+    <color name="widget_text_secondary">#9B9B9B</color>
 </resources>
 

@@ -18,6 +18,16 @@
 
 **新增功能**:
 
+- **Android 桌面小部件**(Tempo 歌词 4x2 桌面小部件)
+  - 长按桌面 → 部件 → 找到 "Tempo 歌词" → 拖到桌面
+  - 显示专辑封面、歌名、艺术家、当前歌词行
+  - 内置播放/暂停 + 下一首按钮
+  - 颜色跟随系统深色/浅色模式
+  - 可自由缩放(横向、纵向)
+  - 点击非按钮区域打开 Tempo 主 App
+  - 每 1 秒刷新一次,歌词行跟随播放进度
+  - 专辑封面用 Glide 异步加载,只在曲目切换时重新加载
+
 - **桌面歌词行数设置**(设置 → 歌词 → 桌面歌词 → 歌词行数)
   - 可选 1 行 / 2 行 / 3 行 / 4 行(默认 2 行)
   - 1 行:仅显示当前行
@@ -37,16 +47,42 @@
 
 - **歌词主开关与子选项联动**:关闭"通知栏歌词"主开关时,"锁屏显示"子选项自动 disable;关闭"桌面歌词"主开关时,5 个桌面歌词子选项(字号/颜色/背景透明度/行数/锁屏显示)自动 disable。
 
+- **桌面歌词对齐方式**(设置 → 歌词 → 桌面歌词 → 对齐方式,默认居中)
+  - 左对齐 / 居中 / 右对齐,设置后实时生效
+
+- **桌面歌词字体透明度**(设置 → 歌词 → 桌面歌词 → 字体透明度,默认 100%)
+  - 20-100% 可调,与"歌词颜色"独立,字色和背景色可分别调透明度
+
+- **桌面歌词背景自适应主题**:根据系统深色/浅色模式自动选择白色或黑色作为背景基础色,与"背景透明度"配合使用。已移除独立的"背景颜色"偏好。
+
+- **桌面歌词颜色加"默认"选项**:颜色列表第一项改为"默认(白色)",原"白色"被替换为该默认项,避免视觉上白色/默认双重存在。
+
+- **通知栏歌词字号**(设置 → 歌词 → 通知栏歌词 → 歌词字号,默认中)
+  - 3 档可选:小(当前 14sp / 上下 12sp,与原版完全一致) / 中(当前 16sp / 上下 14sp) / 大(当前 20sp / 上下 18sp,通知栏会自适应变高)
+  - 使用 `RemoteViews.setFloat` 实现,兼容 API 24+
+  - 颜色沿用原版系统自动主题:`layout/notification_small.xml` 浅色主题用黑字白底,`layout-night/notification_small.xml` 深色主题用白字黑底
+
+- **通知栏歌词点击跳转主 App**:点击通知上的任意一行歌词都能打开 Tempo 主界面(原来只能点通知整体)
+
 **修改文件**:
-- `app/src/main/java/.../util/Preferences.kt` — 改用 `getString()` + 解析;新增 3 个偏好
-- `app/src/main/java/.../service/DesktopLyricsOverlay.kt` — 支持 4 行 + 6 个字号
-- `app/src/main/java/.../service/NotificationHelper.kt` — `setVisibility()` 改为读取偏好
-- `app/src/main/java/.../ui/fragment/SettingsFragment.java` — 新增 `actionLyricsNotificationDependency` / `actionDesktopLyricsDependency`
-- `app/src/tempo/.../service/MediaService.kt` — `DesktopLyricsOverlay.show()` 调用传 4 行
-- `app/src/main/res/values/arrays.xml` — `desktop_lyrics_line_count` 加第 4 项;`desktop_lyrics_font_size` 扩到 6 个;`desktop_lyrics_color` 扩到 11 个
-- `app/src/main/res/values/strings.xml` — 加 5 个字符串 + `settings_title_lyrics = "歌词"`
-- `app/src/main/res/layout/desktop_lyrics_overlay.xml` — 新增 `desktop_lyrics_next2` TextView
-- `app/src/main/res/xml/global_preferences.xml` — 抽出独立的"歌词"分类
+- `app/src/main/java/.../util/Preferences.kt` — 改用 `getString()` + 解析;新增 8 个偏好
+- `app/src/main/java/.../service/DesktopLyricsOverlay.kt` — 支持 4 行 + 6 字号 + 对齐 + 主题自适应背景
+- `app/src/main/java/.../service/NotificationHelper.kt` — 字号 3 档(小号与原版一致);锁屏可见性
+- `app/src/main/java/.../service/MediaService.kt` — `DesktopLyricsOverlay.show()` 调用传 4 行;`updateLyricsNotification()` 末尾触发 widget 刷新
+- `app/src/main/java/.../widget/LyricsWidgetProvider.kt` — 新增,AppWidgetProvider
+- `app/src/main/java/.../widget/LyricsWidgetActions.kt` — 新增,BroadcastReceiver 处理点击
+- `app/src/main/java/.../widget/LyricsWidgetUpdater.kt` — 新增,定时刷新 + 状态拉取
+- `app/src/main/java/.../ui/fragment/SettingsFragment.java` — 主从开关联动
+- `app/src/main/res/values/arrays.xml` — `desktop_lyrics_line_count` 4 项 / `font_size` 6 项 / `color` 11 项 / `alignment` 3 项
+- `app/src/main/res/values/strings.xml` — 加 ~20 个字符串(歌词设置项 + widget)
+- `app/src/main/res/values/colors.xml` + `values-night/colors.xml` — 加 `widget_background_color` / `widget_text_*`
+- `app/src/main/res/layout/desktop_lyrics_overlay.xml` — 加 next2 TextView
+- `app/src/main/res/layout/widget_lyrics.xml` — 新增,widget 布局
+- `app/src/main/res/drawable/widget_background.xml` — 新增,圆角背景
+- `app/src/main/res/drawable/widget_album_background.xml` — 新增,封面占位
+- `app/src/main/res/xml/lyrics_widget_info.xml` — 新增,widget 元数据
+- `app/src/main/res/xml/global_preferences.xml` — "歌词"分类 + 5 个新偏好
+- `app/src/main/AndroidManifest.xml` — 注册 widget provider + action receiver
 - `app/build.gradle` — versionCode 28, versionName 3.9.0.5
 
 ## Version 3.9.0.4

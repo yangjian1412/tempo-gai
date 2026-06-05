@@ -3,6 +3,7 @@ package com.cappielloantonio.tempo.service
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.view.GestureDetector
@@ -34,6 +35,7 @@ object DesktopLyricsOverlay {
     private var initialTouchY: Float = 0f
     private var isLongPress: Boolean = false
     private var lastColor: Int = 0
+    private var lastContext: Context? = null
 
     @JvmStatic
     fun hide() {
@@ -56,6 +58,8 @@ object DesktopLyricsOverlay {
             hide()
             return
         }
+
+        lastContext = context.applicationContext
 
         if (overlayView == null) {
             windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
@@ -144,16 +148,30 @@ object DesktopLyricsOverlay {
 
         overlayView?.let { view ->
             val bgAlpha = Preferences.getDesktopLyricsBgAlpha()
-            val bgColor = Color.argb(bgAlpha * 255 / 100, 0, 0, 0)
+            val nightMode = lastContext?.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)
+            val isDarkMode = nightMode == Configuration.UI_MODE_NIGHT_YES
+            val baseBgColor = if (isDarkMode) 0xFF000000.toInt() else 0xFFFFFFFF.toInt()
+            val bgColor = Color.argb(bgAlpha * 255 / 100, Color.red(baseBgColor), Color.green(baseBgColor), Color.blue(baseBgColor))
             view.setBackgroundColor(bgColor)
 
+            val alignment = Preferences.getDesktopLyricsAlignment()
+            val textGravity = when (alignment) {
+                0 -> Gravity.LEFT
+                2 -> Gravity.RIGHT
+                else -> Gravity.CENTER
+            }
+
+            val textAlpha = Preferences.getDesktopLyricsTextAlpha()
             val color = Preferences.getDesktopLyricsColor()
             val fontSize = getFontSize(Preferences.getDesktopLyricsFontSize())
-            val nextColor = Color.argb(Color.alpha(color) / 2, Color.red(color), Color.green(color), Color.blue(color))
-            val farNextColor = Color.argb(Color.alpha(color) / 3, Color.red(color), Color.green(color), Color.blue(color))
+            val alphaByte = textAlpha * 255 / 100
+            val currentColor = Color.argb(alphaByte, Color.red(color), Color.green(color), Color.blue(color))
+            val nextColor = Color.argb(alphaByte / 2, Color.red(color), Color.green(color), Color.blue(color))
+            val farNextColor = Color.argb(alphaByte / 3, Color.red(color), Color.green(color), Color.blue(color))
 
             prevTextView?.apply {
                 text = prevLine ?: ""
+                gravity = textGravity
                 setTextColor(nextColor)
                 textSize = fontSize * 0.7f
                 visibility = if (lineCount >= 3 && !prevLine.isNullOrEmpty()) View.VISIBLE else View.GONE
@@ -161,13 +179,15 @@ object DesktopLyricsOverlay {
 
             currentTextView?.apply {
                 text = currentLine ?: ""
-                setTextColor(color)
+                gravity = textGravity
+                setTextColor(currentColor)
                 textSize = fontSize.toFloat()
                 visibility = if (currentLine.isNullOrEmpty()) View.GONE else View.VISIBLE
             }
 
             nextTextView?.apply {
                 text = nextLine1 ?: ""
+                gravity = textGravity
                 setTextColor(nextColor)
                 textSize = fontSize * 0.7f
                 visibility = if (lineCount >= 2 && !nextLine1.isNullOrEmpty()) View.VISIBLE else View.GONE
@@ -175,6 +195,7 @@ object DesktopLyricsOverlay {
 
             next2TextView?.apply {
                 text = nextLine2 ?: ""
+                gravity = textGravity
                 setTextColor(farNextColor)
                 textSize = fontSize * 0.6f
                 visibility = if (lineCount >= 4 && !nextLine2.isNullOrEmpty()) View.VISIBLE else View.GONE
