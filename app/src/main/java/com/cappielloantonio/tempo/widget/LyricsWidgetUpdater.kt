@@ -57,6 +57,11 @@ object LyricsWidgetUpdater {
             if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
         )
 
+        val position = MediaService.getCurrentPosition()
+        val duration = MediaService.getDuration()
+        val progress = if (duration > 0) ((position.toDouble() / duration.toDouble()) * 100).toInt().coerceIn(0, 100) else 0
+        views.setProgressBar(R.id.widget_progress, 100, progress, false)
+
         if (lastBitmap != null && lastArtworkUrl == mediaItem?.mediaMetadata?.artworkUri?.toString()) {
             views.setImageViewBitmap(R.id.widget_album_art, lastBitmap)
         } else {

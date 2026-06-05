@@ -27,12 +27,12 @@ object NotificationHelper {
     private const val NOTIFICATION_ID = 1
     private const val LYRICS_NOTIFICATION_ID = 2
 
-    private const val FONT_SIZE_NOTIFICATION_PREV_NEXT_SMALL = 12f
-    private const val FONT_SIZE_NOTIFICATION_CURRENT_SMALL = 14f
-    private const val FONT_SIZE_NOTIFICATION_PREV_NEXT_MEDIUM = 15f
-    private const val FONT_SIZE_NOTIFICATION_CURRENT_MEDIUM = 18f
-    private const val FONT_SIZE_NOTIFICATION_PREV_NEXT_LARGE = 18f
-    private const val FONT_SIZE_NOTIFICATION_CURRENT_LARGE = 21f
+    private const val FONT_SIZE_NOTIFICATION_PREV_NEXT_SMALL = 10f
+    private const val FONT_SIZE_NOTIFICATION_CURRENT_SMALL = 12f
+    private const val FONT_SIZE_NOTIFICATION_PREV_NEXT_MEDIUM = 12f
+    private const val FONT_SIZE_NOTIFICATION_CURRENT_MEDIUM = 15f
+    private const val FONT_SIZE_NOTIFICATION_PREV_NEXT_LARGE = 15f
+    private const val FONT_SIZE_NOTIFICATION_CURRENT_LARGE = 18f
 
     fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

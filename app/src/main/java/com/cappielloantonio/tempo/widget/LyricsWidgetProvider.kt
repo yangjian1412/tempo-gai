@@ -52,12 +52,22 @@ class LyricsWidgetProvider : AppWidgetProvider() {
             views.setOnClickPendingIntent(R.id.widget_title, openAppPending)
             views.setOnClickPendingIntent(R.id.widget_artist, openAppPending)
             views.setOnClickPendingIntent(R.id.widget_lyrics, openAppPending)
+            views.setOnClickPendingIntent(R.id.widget_progress, openAppPending)
+
+            val prevIntent = Intent(context, LyricsWidgetActions::class.java).apply {
+                action = LyricsWidgetActions.ACTION_PREVIOUS
+            }
+            val prevPending = PendingIntent.getBroadcast(
+                context, 1, prevIntent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+            views.setOnClickPendingIntent(R.id.widget_prev, prevPending)
 
             val playPauseIntent = Intent(context, LyricsWidgetActions::class.java).apply {
                 action = LyricsWidgetActions.ACTION_PLAY_PAUSE
             }
             val playPausePending = PendingIntent.getBroadcast(
-                context, 1, playPauseIntent,
+                context, 2, playPauseIntent,
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             )
             views.setOnClickPendingIntent(R.id.widget_play_pause, playPausePending)
@@ -66,7 +76,7 @@ class LyricsWidgetProvider : AppWidgetProvider() {
                 action = LyricsWidgetActions.ACTION_NEXT
             }
             val nextPending = PendingIntent.getBroadcast(
-                context, 2, nextIntent,
+                context, 3, nextIntent,
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             )
             views.setOnClickPendingIntent(R.id.widget_next, nextPending)

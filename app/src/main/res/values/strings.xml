@@ -289,6 +289,7 @@
     <string name="widget_album_art">专辑封面</string>
     <string name="widget_play_pause">播放/暂停</string>
     <string name="widget_next">下一首</string>
+    <string name="widget_previous">上一首</string>
     <string name="settings_audio_transcode_download_format">Transcode format</string>
     <string name="settings_audio_transcode_download_priority_summary">If enabled, Tempo will not force download the track with the transcode settings below.</string>
     <string name="settings_audio_transcode_download_priority_title">Prioritize server settings used for streaming in downloads</string>
