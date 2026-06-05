@@ -93,6 +93,12 @@ object NotificationHelper {
             getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         }
 
+        val visibility = if (com.cappielloantonio.tempo.util.Preferences.isLyricsNotificationLockScreenEnabled()) {
+            NotificationCompat.VISIBILITY_PUBLIC
+        } else {
+            NotificationCompat.VISIBILITY_SECRET
+        }
+
         val notification = NotificationCompat.Builder(context, LYRICS_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_lyrics)
             .setContentTitle(title ?: "Unknown")
@@ -101,7 +107,7 @@ object NotificationHelper {
             .setOnlyAlertOnce(true)
             .setShowWhen(false)
             .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setVisibility(visibility)
             .setCustomContentView(lyricsView)
             .setOngoing(true)
             .build()

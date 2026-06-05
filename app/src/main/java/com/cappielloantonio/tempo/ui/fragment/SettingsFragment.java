@@ -103,6 +103,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         actionDeleteDownloadStorage();
         actionDesktopLyrics();
         actionKeepScreenOn();
+        actionLyricsNotificationDependency();
+        actionDesktopLyricsDependency();
     }
 
     @Override
@@ -340,6 +342,52 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 } else {
                     com.cappielloantonio.tempo.service.DesktopLyricsOverlay.hide();
                 }
+            }
+            return true;
+        });
+    }
+
+    private void actionLyricsNotificationDependency() {
+        androidx.preference.Preference lockScreenPref = findPreference("lyrics_notification_lock_screen");
+        androidx.preference.Preference masterPref = findPreference("lyrics_notification");
+        if (lockScreenPref == null || masterPref == null) return;
+        boolean enabled = masterPref.getSharedPreferences().getBoolean("lyrics_notification", false);
+        lockScreenPref.setEnabled(enabled);
+        masterPref.setOnPreferenceChangeListener((preference, newValue) -> {
+            if (newValue instanceof Boolean) {
+                lockScreenPref.setEnabled((Boolean) newValue);
+            }
+            return true;
+        });
+    }
+
+    private void actionDesktopLyricsDependency() {
+        androidx.preference.Preference fontSizePref = findPreference("desktop_lyrics_font_size");
+        androidx.preference.Preference colorPref = findPreference("desktop_lyrics_color");
+        androidx.preference.Preference bgAlphaPref = findPreference("desktop_lyrics_bg_alpha");
+        androidx.preference.Preference lineCountPref = findPreference("desktop_lyrics_line_count");
+        androidx.preference.Preference masterPref = findPreference("desktop_lyrics");
+        if (masterPref == null) return;
+        boolean enabled = masterPref.getSharedPreferences().getBoolean("desktop_lyrics", false);
+        if (fontSizePref != null) fontSizePref.setEnabled(enabled);
+        if (colorPref != null) colorPref.setEnabled(enabled);
+        if (bgAlphaPref != null) bgAlphaPref.setEnabled(enabled);
+        if (lineCountPref != null) lineCountPref.setEnabled(enabled);
+        masterPref.setOnPreferenceChangeListener((preference, newValue) -> {
+            if (newValue instanceof Boolean) {
+                boolean newEnabled = (Boolean) newValue;
+                if (newEnabled) {
+                    if (!SettingsFragment.this.hasOverlayPermission()) {
+                        SettingsFragment.this.requestOverlayPermission();
+                        return false;
+                    }
+                } else {
+                    com.cappielloantonio.tempo.service.DesktopLyricsOverlay.hide();
+                }
+                if (fontSizePref != null) fontSizePref.setEnabled(newEnabled);
+                if (colorPref != null) colorPref.setEnabled(newEnabled);
+                if (bgAlphaPref != null) bgAlphaPref.setEnabled(newEnabled);
+                if (lineCountPref != null) lineCountPref.setEnabled(newEnabled);
             }
             return true;
         });

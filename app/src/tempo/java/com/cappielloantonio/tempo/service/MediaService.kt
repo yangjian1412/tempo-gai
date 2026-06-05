@@ -214,7 +214,7 @@ class MediaService : MediaLibraryService(), SessionAvailabilityListener {
         }
 
         if (Preferences.isDesktopLyricsEnabled() && hasLyrics) {
-            DesktopLyricsOverlay.show(this, currentLine, nextLine1)
+            DesktopLyricsOverlay.show(this, prevLine, currentLine, nextLine1, nextLine2)
         } else {
             DesktopLyricsOverlay.hide()
         }

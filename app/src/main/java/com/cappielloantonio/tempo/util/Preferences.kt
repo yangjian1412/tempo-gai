@@ -65,12 +65,14 @@ object Preferences {
     private const val CONTINUOUS_PLAY = "continuous_play"
     private const val LAST_INSTANT_MIX = "last_instant_mix"
     private const val LYRICS_NOTIFICATION = "lyrics_notification"
+    private const val LYRICS_NOTIFICATION_LOCK_SCREEN = "lyrics_notification_lock_screen"
     private const val DESKTOP_LYRICS = "desktop_lyrics"
-    private const val SYSTEM_PLAYER_LYRICS = "system_player_lyrics"
     private const val DESKTOP_LYRICS_FONT_SIZE = "desktop_lyrics_font_size"
     private const val DESKTOP_LYRICS_COLOR = "desktop_lyrics_color"
     private const val DESKTOP_LYRICS_BG_ALPHA = "desktop_lyrics_bg_alpha"
     private const val DESKTOP_LYRICS_POSITION = "desktop_lyrics_position"
+    private const val DESKTOP_LYRICS_LINE_COUNT = "desktop_lyrics_line_count"
+    private const val SYSTEM_PLAYER_LYRICS = "system_player_lyrics"
 
 
     @JvmStatic
@@ -515,6 +517,16 @@ object Preferences {
     }
 
     @JvmStatic
+    fun isLyricsNotificationLockScreenEnabled(): Boolean {
+        return App.getInstance().preferences.getBoolean(LYRICS_NOTIFICATION_LOCK_SCREEN, true)
+    }
+
+    @JvmStatic
+    fun setLyricsNotificationLockScreenEnabled(enabled: Boolean) {
+        App.getInstance().preferences.edit().putBoolean(LYRICS_NOTIFICATION_LOCK_SCREEN, enabled).apply()
+    }
+
+    @JvmStatic
     fun isDesktopLyricsEnabled(): Boolean {
         return App.getInstance().preferences.getBoolean(DESKTOP_LYRICS, false)
     }
@@ -537,7 +549,7 @@ object Preferences {
     @JvmStatic
     fun getDesktopLyricsFontSize(): Int {
         return try {
-            App.getInstance().preferences.getInt(DESKTOP_LYRICS_FONT_SIZE, 1)
+            App.getInstance().preferences.getString(DESKTOP_LYRICS_FONT_SIZE, "1")?.toIntOrNull() ?: 1
         } catch (e: Exception) {
             1
         }
@@ -590,5 +602,19 @@ object Preferences {
     @JvmStatic
     fun setDesktopLyricsPosition(position: Int) {
         App.getInstance().preferences.edit().putInt(DESKTOP_LYRICS_POSITION, position).apply()
+    }
+
+    @JvmStatic
+    fun getDesktopLyricsLineCount(): Int {
+        return try {
+            App.getInstance().preferences.getString(DESKTOP_LYRICS_LINE_COUNT, "2")?.toIntOrNull() ?: 2
+        } catch (e: Exception) {
+            2
+        }
+    }
+
+    @JvmStatic
+    fun setDesktopLyricsLineCount(count: Int) {
+        App.getInstance().preferences.edit().putInt(DESKTOP_LYRICS_LINE_COUNT, count).apply()
     }
 }

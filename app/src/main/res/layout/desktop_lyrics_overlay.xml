@@ -9,6 +9,16 @@
     android:paddingVertical="12dp">
 
     <TextView
+        android:id="@+id/desktop_lyrics_prev"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text=""
+        android:textColor="#88FFFFFF"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
+    <TextView
         android:id="@+id/desktop_lyrics_current"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,9 +33,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:paddingTop="8dp"
+        android:paddingTop="4dp"
         android:text=""
         android:textColor="#88FFFFFF"
         android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/desktop_lyrics_next2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="4dp"
+        android:text=""
+        android:textColor="#66FFFFFF"
+        android:textSize="14sp"
+        android:visibility="gone" />
 
 </LinearLayout>

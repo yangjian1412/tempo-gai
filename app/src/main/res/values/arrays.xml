@@ -256,30 +256,59 @@
     </string-array>
 
     <string-array name="desktop_lyrics_font_size_titles">
+        <item>极小</item>
         <item>小</item>
         <item>中</item>
         <item>大</item>
+        <item>特大</item>
+        <item>超大</item>
     </string-array>
     <string-array name="desktop_lyrics_font_size_values">
         <item>0</item>
         <item>1</item>
         <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
     </string-array>
 
     <string-array name="desktop_lyrics_color_titles">
         <item>白色</item>
+        <item>黑色</item>
+        <item>红色</item>
+        <item>橙色</item>
         <item>黄色</item>
-        <item>粉色</item>
-        <item>蓝色</item>
         <item>绿色</item>
+        <item>青色</item>
+        <item>蓝色</item>
+        <item>粉色</item>
         <item>紫色</item>
+        <item>金色</item>
     </string-array>
     <string-array name="desktop_lyrics_color_values">
         <item>0xFFFFFFFF</item>
+        <item>0xFF000000</item>
+        <item>0xFFFF3030</item>
+        <item>0xFFFFA500</item>
         <item>0xFFFFFF00</item>
-        <item>0xFFFF69B4</item>
-        <item>0xFF00BFFF</item>
         <item>0xFF00FF7F</item>
+        <item>0xFF00CED1</item>
+        <item>0xFF00BFFF</item>
+        <item>0xFFFF69B4</item>
         <item>0xFFDA70D6</item>
+        <item>0xFFFFD700</item>
+    </string-array>
+
+    <string-array name="desktop_lyrics_line_count_titles">
+        <item>1 行</item>
+        <item>2 行</item>
+        <item>3 行</item>
+        <item>4 行</item>
+    </string-array>
+    <string-array name="desktop_lyrics_line_count_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
     </string-array>
 </resources>
