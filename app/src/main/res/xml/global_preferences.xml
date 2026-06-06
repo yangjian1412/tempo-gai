@@ -96,7 +96,7 @@
             android:key="lyrics_notification_lock_screen" />
 
         <ListPreference
-            app:defaultValue="1"
+            app:defaultValue="0"
             app:dialogTitle="@string/settings_lyrics_notification_font_size_title"
             app:entries="@array/lyrics_notification_font_size_titles"
             app:entryValues="@array/lyrics_notification_font_size_values"

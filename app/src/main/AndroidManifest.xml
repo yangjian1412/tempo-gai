@@ -88,6 +88,30 @@
         </receiver>
 
         <receiver
+            android:name=".widget.SolidLyricsWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_solid_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/lyrics_widget_solid_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.DynamicLyricsWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_dynamic_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/lyrics_widget_dynamic_info" />
+        </receiver>
+
+        <receiver
             android:name=".widget.LyricsWidgetActions"
             android:exported="false" />
     </application>

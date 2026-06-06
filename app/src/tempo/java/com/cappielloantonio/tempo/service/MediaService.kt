@@ -86,6 +86,15 @@ class MediaService : MediaLibraryService(), SessionAvailabilityListener {
         }
 
         @JvmStatic
+        fun seekToPosition(position: Long) {
+            val player = instance?.player ?: return
+            val duration = player.duration
+            if (duration > 0) {
+                player.seekTo(position.coerceIn(0L, duration))
+            }
+        }
+
+        @JvmStatic
         fun getCurrentPosition(): Long = instance?.player?.currentPosition ?: 0L
 
         @JvmStatic

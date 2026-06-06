@@ -20,6 +20,7 @@ import com.cappielloantonio.tempo.util.Preferences
 
 @OptIn(UnstableApi::class)
 object NotificationHelper {
+    private data class Quadruple<A, B, C, D>(val a: A, val b: B, val c: C, val d: D)
     private const val CHANNEL_ID = "tempo_playback_channel"
     private const val CHANNEL_NAME = "Tempo Playback"
     private const val LYRICS_CHANNEL_ID = "tempo_lyrics_channel"
@@ -27,12 +28,12 @@ object NotificationHelper {
     private const val NOTIFICATION_ID = 1
     private const val LYRICS_NOTIFICATION_ID = 2
 
-    private const val FONT_SIZE_NOTIFICATION_PREV_NEXT_SMALL = 10f
-    private const val FONT_SIZE_NOTIFICATION_CURRENT_SMALL = 12f
-    private const val FONT_SIZE_NOTIFICATION_PREV_NEXT_MEDIUM = 12f
-    private const val FONT_SIZE_NOTIFICATION_CURRENT_MEDIUM = 15f
-    private const val FONT_SIZE_NOTIFICATION_PREV_NEXT_LARGE = 15f
-    private const val FONT_SIZE_NOTIFICATION_CURRENT_LARGE = 18f
+    private const val FONT_SIZE_NOTIFICATION_PREV_NEXT_SMALL = 13f
+    private const val FONT_SIZE_NOTIFICATION_CURRENT_SMALL = 15f
+    private const val FONT_SIZE_NOTIFICATION_PREV_NEXT_MEDIUM = 16f
+    private const val FONT_SIZE_NOTIFICATION_CURRENT_MEDIUM = 18f
+    private const val FONT_SIZE_NOTIFICATION_PREV_NEXT_LARGE = 20f
+    private const val FONT_SIZE_NOTIFICATION_CURRENT_LARGE = 22f
 
     fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -105,24 +106,21 @@ object NotificationHelper {
         lyricsView.setOnClickPendingIntent(R.id.notification_lyrics_next1, contentIntent)
         lyricsView.setOnClickPendingIntent(R.id.notification_lyrics_next2, contentIntent)
 
-        val density = context.resources.displayMetrics.scaledDensity
-        val (currentSp, prevNextSp, showPrev) = when (Preferences.getLyricsNotificationFontSize()) {
-            0 -> Triple(FONT_SIZE_NOTIFICATION_CURRENT_SMALL, FONT_SIZE_NOTIFICATION_PREV_NEXT_SMALL, false)
-            2 -> Triple(FONT_SIZE_NOTIFICATION_CURRENT_LARGE, FONT_SIZE_NOTIFICATION_PREV_NEXT_LARGE, false)
-            else -> Triple(FONT_SIZE_NOTIFICATION_CURRENT_MEDIUM, FONT_SIZE_NOTIFICATION_PREV_NEXT_MEDIUM, true)
+        val (currentSp, prevNextSp, showNext2, showPrev) = when (Preferences.getLyricsNotificationFontSize()) {
+            1 -> Quadruple(FONT_SIZE_NOTIFICATION_CURRENT_MEDIUM, FONT_SIZE_NOTIFICATION_PREV_NEXT_MEDIUM, false, true)
+            2 -> Quadruple(FONT_SIZE_NOTIFICATION_CURRENT_LARGE, FONT_SIZE_NOTIFICATION_PREV_NEXT_LARGE, false, false)
+            else -> Quadruple(FONT_SIZE_NOTIFICATION_CURRENT_SMALL, FONT_SIZE_NOTIFICATION_PREV_NEXT_SMALL, true, true)
         }
-        val currentSizePx = currentSp * density
-        val nextSizePx = prevNextSp * density
 
-        lyricsView.setFloat(R.id.notification_lyrics_prev, "setTextSize", nextSizePx)
-        lyricsView.setFloat(R.id.notification_lyrics_current, "setTextSize", currentSizePx)
-        lyricsView.setFloat(R.id.notification_lyrics_next1, "setTextSize", nextSizePx)
+        lyricsView.setFloat(R.id.notification_lyrics_prev, "setTextSize", prevNextSp)
+        lyricsView.setFloat(R.id.notification_lyrics_current, "setTextSize", currentSp)
+        lyricsView.setFloat(R.id.notification_lyrics_next1, "setTextSize", prevNextSp)
+        lyricsView.setFloat(R.id.notification_lyrics_next2, "setTextSize", prevNextSp)
 
-        lyricsView.setViewVisibility(
-            R.id.notification_lyrics_prev,
-            if (showPrev) android.view.View.VISIBLE else android.view.View.GONE
-        )
-        lyricsView.setViewVisibility(R.id.notification_lyrics_next2, android.view.View.GONE)
+        lyricsView.setViewVisibility(R.id.notification_lyrics_prev,
+            if (showPrev) android.view.View.VISIBLE else android.view.View.GONE)
+        lyricsView.setViewVisibility(R.id.notification_lyrics_next2,
+            if (showNext2) android.view.View.VISIBLE else android.view.View.GONE)
         lyricsView.setViewVisibility(R.id.notification_lyrics_current, android.view.View.VISIBLE)
         lyricsView.setViewVisibility(R.id.notification_lyrics_next1, android.view.View.VISIBLE)
 

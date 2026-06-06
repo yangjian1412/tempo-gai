@@ -532,9 +532,9 @@ object Preferences {
     @JvmStatic
     fun getLyricsNotificationFontSize(): Int {
         return try {
-            App.getInstance().preferences.getString(LYRICS_NOTIFICATION_FONT_SIZE, "1")?.toIntOrNull() ?: 1
+            App.getInstance().preferences.getString(LYRICS_NOTIFICATION_FONT_SIZE, "0")?.toIntOrNull() ?: 0
         } catch (e: Exception) {
-            1
+            0
         }
     }
 

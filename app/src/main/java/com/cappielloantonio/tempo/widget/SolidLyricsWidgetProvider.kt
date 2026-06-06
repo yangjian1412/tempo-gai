@@ -10,7 +10,7 @@ import android.widget.RemoteViews
 import com.cappielloantonio.tempo.R
 import com.cappielloantonio.tempo.ui.activity.MainActivity
 
-class LyricsWidgetProvider : AppWidgetProvider() {
+class SolidLyricsWidgetProvider : AppWidgetProvider() {
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
@@ -35,7 +35,7 @@ class LyricsWidgetProvider : AppWidgetProvider() {
             appWidgetManager: AppWidgetManager,
             appWidgetId: Int
         ) {
-            val views = RemoteViews(context.packageName, R.layout.widget_lyrics)
+            val views = RemoteViews(context.packageName, R.layout.widget_lyrics_solid)
             wireClickListeners(context, views)
             LyricsWidgetUpdater.populateState(context, views)
             appWidgetManager.updateAppWidget(appWidgetId, views)
@@ -54,44 +54,44 @@ class LyricsWidgetProvider : AppWidgetProvider() {
 
             views.setOnClickPendingIntent(
                 R.id.widget_prev,
-                broadcastPending(context, LyricsWidgetActions.ACTION_PREVIOUS, 1)
+                broadcastPending(context, LyricsWidgetActions.ACTION_PREVIOUS, 11)
             )
             views.setOnClickPendingIntent(
                 R.id.widget_play_pause,
-                broadcastPending(context, LyricsWidgetActions.ACTION_PLAY_PAUSE, 2)
+                broadcastPending(context, LyricsWidgetActions.ACTION_PLAY_PAUSE, 12)
             )
             views.setOnClickPendingIntent(
                 R.id.widget_next,
-                broadcastPending(context, LyricsWidgetActions.ACTION_NEXT, 3)
+                broadcastPending(context, LyricsWidgetActions.ACTION_NEXT, 13)
             )
             views.setOnClickPendingIntent(
                 R.id.widget_shuffle,
-                broadcastPending(context, LyricsWidgetActions.ACTION_SHUFFLE, 4)
+                broadcastPending(context, LyricsWidgetActions.ACTION_SHUFFLE, 14)
             )
             views.setOnClickPendingIntent(
                 R.id.widget_repeat,
-                broadcastPending(context, LyricsWidgetActions.ACTION_REPEAT, 5)
+                broadcastPending(context, LyricsWidgetActions.ACTION_REPEAT, 15)
             )
 
             views.setOnClickPendingIntent(
                 R.id.widget_seek_10,
-                broadcastPending(context, LyricsWidgetActions.ACTION_SEEK_10, 6)
+                broadcastPending(context, LyricsWidgetActions.ACTION_SEEK_10, 16)
             )
             views.setOnClickPendingIntent(
                 R.id.widget_seek_30,
-                broadcastPending(context, LyricsWidgetActions.ACTION_SEEK_30, 7)
+                broadcastPending(context, LyricsWidgetActions.ACTION_SEEK_30, 17)
             )
             views.setOnClickPendingIntent(
                 R.id.widget_seek_50,
-                broadcastPending(context, LyricsWidgetActions.ACTION_SEEK_50, 8)
+                broadcastPending(context, LyricsWidgetActions.ACTION_SEEK_50, 18)
             )
             views.setOnClickPendingIntent(
                 R.id.widget_seek_70,
-                broadcastPending(context, LyricsWidgetActions.ACTION_SEEK_70, 9)
+                broadcastPending(context, LyricsWidgetActions.ACTION_SEEK_70, 19)
             )
             views.setOnClickPendingIntent(
                 R.id.widget_seek_90,
-                broadcastPending(context, LyricsWidgetActions.ACTION_SEEK_90, 10)
+                broadcastPending(context, LyricsWidgetActions.ACTION_SEEK_90, 20)
             )
         }
 
@@ -107,7 +107,7 @@ class LyricsWidgetProvider : AppWidgetProvider() {
 
         fun refreshAll(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
-            val component = ComponentName(context, LyricsWidgetProvider::class.java)
+            val component = ComponentName(context, SolidLyricsWidgetProvider::class.java)
             val ids = manager.getAppWidgetIds(component)
             if (ids.isEmpty()) return
             ids.forEach { id ->

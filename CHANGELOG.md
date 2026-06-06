@@ -1,5 +1,21 @@
 # Tempo Mod Changelog
 
+## 开发计划（未来版本）
+
+### 4 号小部件 - 自定义配置播放器（计划中，未排期）
+- 用户在添加第 4 个小部件时，弹出配置 Activity（`android:configure`），可选：
+  - 字体颜色（color picker 或预设色板）
+  - 进度条颜色
+  - 背景颜色（整块纯色，受 RemoteViews 限制不能圆角渐变）
+  - 透明度（整 widget 一起透明，受 RemoteViews 限制不能分元素）
+  - 是否显示歌词
+- 按 widgetId 存 SharedPreferences，支持桌面上同时存在多个第 4 号 widget 实例，每个配置独立
+- widget 上加"设置"按钮支持重新配置（删除重加之外的方案）
+- 实现方式：第 4 个 AppWidgetProvider + WidgetConfigActivity + 按 widgetId 存 SharedPreferences
+- 状态：设计阶段，未排期
+
+---
+
 ## Version 3.9.0.5 (开发中)
 
 **基于版本**: Tempo 3.9.0.4 (本 Mod 上一版)
@@ -7,128 +23,48 @@
 **开发者**: 六分仪 (Liuyi)
 
 **概述**:
-3.9.0.5 修复设置项显示顺序 bug,新增桌面歌词行数设置、桌面歌词锁屏显示开关、通知栏歌词锁屏显示开关,并在此过程中修复了行数/字号/颜色等设置一直默认值的根因 bug。
-
-**Bug 修复**:
-
-- **设置界面显示顺序错误**:桌面歌词的字号/颜色/背景透明度选项原本显示在系统播放器歌词选项下方,现已调整到桌面歌词开关正下方,所有桌面歌词子选项聚拢成一组
-- **桌面歌词行数设置不起作用** (`getDesktopLyricsLineCount`):根本原因是使用 `getInt()` 读取 `ListPreference` 持久化的值,但 `ListPreference` 实际存的是 String,导致 `getInt()` 抛 `ClassCastException` 后被 try-catch 吞掉,始终返回默认值。改为 `getString()` + `toIntOrNull()` 解析。
-- **桌面歌词锁屏显示不生效**:`FLAG_SHOW_WHEN_LOCKED` 设置逻辑不够鲁棒,flag 变化时原代码会销毁并重建整个 view。改为 flag 变化时只调用 `updateViewLayout()` 更新已有 view 的 flags,并注册 `ACTION_SCREEN_ON` / `ACTION_USER_PRESENT` 广播接收器,确保锁屏→解锁后窗口布局被重新应用。
-- **字号/颜色设置一直默认值**:与行数同一根因,顺便一并修复。
+3.9.0.5 大幅强化歌词设置（行数/对齐/透明度/字号多档/锁屏显示），并首次引入 **3 个 Android 桌面小部件**（透明播放器 / 纯色播放器 / 专辑色播放器）。
 
 **新增功能**:
 
-- **Android 桌面小部件**(Tempo 歌词 4x2 桌面小部件)
-  - 长按桌面 → 部件 → 找到 "Tempo 歌词" → 拖到桌面
-  - 布局: 顶部 [专辑封面] [标题/艺术家/歌词] [上一首 ▶播放/暂停 ⏭下一首],底部进度条
-  - 3 个控件按钮: 上一首、播放/暂停、下一首
-  - 底部进度条: 显示当前播放进度(用 LayerList 自定义颜色,跟主题)
-  - 背景透明度从 95% 降到 50%(F2→80),更通透
-  - 颜色跟随系统深色/浅色模式
-  - 可自由缩放(横向、纵向)
-  - 点击非按钮区域打开 Tempo 主 App
-  - 每 1 秒刷新一次,歌词行跟随播放进度
-  - 专辑封面用 Glide 异步加载,只在曲目切换时重新加载
+### 桌面歌词强化
+- **歌词行数**：1 / 2 / 3 / 4 行可选（默认 2 行）
+- **对齐方式**：左 / 中 / 右（默认居中）
+- **字体透明度**：20-100% 可调（与"歌词颜色"独立）
+- **背景自适应主题**：根据系统深色/浅色模式自动选择白/黑基础色（已移除独立"背景颜色"偏好）
+- **颜色列表加"默认"**：第一项"默认(白色)"，避免视觉上双重存在
 
-- **桌面歌词行数设置**(设置 → 歌词 → 桌面歌词 → 歌词行数)
-  - 可选 1 行 / 2 行 / 3 行 / 4 行(默认 2 行)
-  - 1 行:仅显示当前行
-  - 2 行:当前行 + 下一行
-  - 3 行:上一行 + 当前行 + 下一行
-  - 4 行:上一行 + 当前行 + 下一行 + 下两行
+### 通知栏歌词强化
+- **字号 3 档**（默认"小"）：
+  - 小：13sp 上下行 / 15sp 当前行，4 行显示
+  - 中：16sp 上下行 / 18sp 当前行，3 行显示
+  - 大：20sp 上下行 / 22sp 当前行，2 行显示
+- **锁屏显示开关**（默认开）：锁屏后通知栏仍显示完整歌词（`VISIBILITY_PUBLIC` / `VISIBILITY_SECRET`）
+- **点击通知栏任意一行**打开主 App（原来只能点通知整体）
 
-- **桌面歌词锁屏显示开关**:已删除
-  - 原因:在小米/HyperOS 上,`FLAG_SHOW_WHEN_LOCKED` 需要用户去系统设置单独授权,代码层无法绕开,实测不稳定
-  - 替代:需要锁屏看歌词时,使用"通知栏歌词 + 锁屏显示"
+### 设置项重构
+- **"歌词"独立成组**：从原"界面"分类抽出，新建立"歌词"分类，包含通知栏歌词 / 桌面歌词 / 系统播放器歌词及其子项
+- **主从开关联动**：关闭主开关时子选项自动 disable
 
-- **通知栏歌词锁屏显示开关**(设置 → 歌词 → 通知栏歌词 → 锁屏显示,默认开)
-  - 开启:锁屏后通知栏仍显示完整歌词内容(`VISIBILITY_PUBLIC`)
-  - 关闭:锁屏后通知栏隐藏歌词内容(`VISIBILITY_SECRET`)
+### Android 桌面小部件（3 个变体）
 
-- **歌词设置独立成组**:在设置界面把"通知栏歌词 / 桌面歌词 / 系统播放器歌词"及相关子项从原来的"界面"分类中抽出,新建独立的"歌词"分类。
+长按桌面 → 部件 → 选 Tempo 提供的 3 个小部件之一 → 拖到桌面。4x2 尺寸，可自由缩放，每秒自动刷新。
 
-- **歌词主开关与子选项联动**:关闭"通知栏歌词"主开关时,"锁屏显示"子选项自动 disable;关闭"桌面歌词"主开关时,5 个桌面歌词子选项(字号/颜色/背景透明度/行数/锁屏显示)自动 disable。
+| 名称 | 背景 | 圆角 |
+|------|------|------|
+| **透明播放器** | 50% 半透明，跟随主题色 | 16dp |
+| **纯色播放器** | 纯色 `#F0F0F0` / `#202020` | 16dp |
+| **专辑色播放器** | 专辑图高斯模糊 + 25% 主题色蒙版 | 16dp |
 
-- **桌面歌词对齐方式**(设置 → 歌词 → 桌面歌词 → 对齐方式,默认居中)
-  - 左对齐 / 居中 / 右对齐,设置后实时生效
+统一布局：
+- 顶部：60dp 专辑封面 + 标题/艺术家/歌词（2 行）
+- 中部：5 个控件（shuffle / 上一首 / 播放暂停 / 下一首 / 重复）
+- 底部：4dp 进度条（带圆头 thumb） + 5 段点击 seek（10% / 30% / 50% / 70% / 90%）
+- 点击非按钮区域打开主 App
+- 颜色跟随系统深色/浅色模式
+- 专辑封面用 Glide 异步加载，切歌时自动重载
 
-- **桌面歌词字体透明度**(设置 → 歌词 → 桌面歌词 → 字体透明度,默认 100%)
-  - 20-100% 可调,与"歌词颜色"独立,字色和背景色可分别调透明度
-
-- **桌面歌词背景自适应主题**:根据系统深色/浅色模式自动选择白色或黑色作为背景基础色,与"背景透明度"配合使用。已移除独立的"背景颜色"偏好。
-
-- **桌面歌词颜色加"默认"选项**:颜色列表第一项改为"默认(白色)",原"白色"被替换为该默认项,避免视觉上白色/默认双重存在。
-
-- **通知栏歌词字号**(设置 → 歌词 → 通知栏歌词 → 歌词字号,默认中)
-  - 3 档可选,小号做得比原版还小(10sp/12sp),中号/大号按 25%/50% 比例递增:
-    - **小**(10sp 上下行 / 12sp 当前行):2 行显示(当前 + 下一句)
-    - **中**(12sp 上下行 / 15sp 当前行):3 行显示(上 + 当前 + 下,中号比小号大约 25%)
-    - **大**(15sp 上下行 / 18sp 当前行):2 行显示(大号比小号大约 50%,行数回退到 2 行避免过高)
-  - 同时减小通知栏 layout 的 paddingVertical(8→4dp)和 paddingTop(4→1dp),让通知整体更紧凑
-  - 使用 `RemoteViews.setFloat` + `setViewVisibility` 实现,兼容 API 24+
-  - 颜色沿用原版系统自动主题:`layout/notification_small.xml` 浅色主题用黑字白底,`layout-night/notification_small.xml` 深色主题用白字黑底
-
-- **通知栏歌词点击跳转主 App**:点击通知上的任意一行歌词都能打开 Tempo 主界面(原来只能点通知整体)
-
-**修改文件**:
-- `app/src/main/java/.../util/Preferences.kt` — 改用 `getString()` + 解析;新增 8 个偏好
-- `app/src/main/java/.../service/DesktopLyricsOverlay.kt` — 支持 4 行 + 6 字号 + 对齐 + 主题自适应背景
-- `app/src/main/java/.../service/NotificationHelper.kt` — 字号 3 档(小号与原版一致);锁屏可见性
-- `app/src/main/java/.../service/MediaService.kt` — `DesktopLyricsOverlay.show()` 调用传 4 行;`updateLyricsNotification()` 末尾触发 widget 刷新
-- `app/src/main/java/.../widget/LyricsWidgetProvider.kt` — 新增,AppWidgetProvider
-- `app/src/main/java/.../widget/LyricsWidgetActions.kt` — 新增,BroadcastReceiver 处理点击
-- `app/src/main/java/.../widget/LyricsWidgetUpdater.kt` — 新增,定时刷新 + 状态拉取
-- `app/src/main/java/.../ui/fragment/SettingsFragment.java` — 主从开关联动
-- `app/src/main/res/values/arrays.xml` — `desktop_lyrics_line_count` 4 项 / `font_size` 6 项 / `color` 11 项 / `alignment` 3 项
-- `app/src/main/res/values/strings.xml` — 加 ~20 个字符串(歌词设置项 + widget)
-- `app/src/main/res/values/colors.xml` + `values-night/colors.xml` — 加 `widget_background_color` / `widget_text_*`
-- `app/src/main/res/layout/desktop_lyrics_overlay.xml` — 加 next2 TextView
-- `app/src/main/res/layout/widget_lyrics.xml` — 新增,widget 布局
-- `app/src/main/res/drawable/widget_background.xml` — 新增,圆角背景
-- `app/src/main/res/drawable/widget_album_background.xml` — 新增,封面占位
-- `app/src/main/res/xml/lyrics_widget_info.xml` — 新增,widget 元数据
-- `app/src/main/res/xml/global_preferences.xml` — "歌词"分类 + 5 个新偏好
-- `app/src/main/AndroidManifest.xml` — 注册 widget provider + action receiver
-- `app/build.gradle` — versionCode 28, versionName 3.9.0.5
-
-## Version 3.9.0.4
-
-**基于版本**: Tempo 3.9.0.4 (本 Mod 上一版)
-
-**开发者**: 六分仪 (Liuyi)
-
-**概述**:
-3.9.0.5 修复了设置项显示顺序 bug,并新增桌面歌词行数设置、桌面歌词锁屏显示开关、通知栏歌词锁屏显示开关。
-
-**Bug 修复**:
-- 设置界面显示顺序错误:桌面歌词的字号/颜色/背景透明度选项原本显示在系统播放器歌词选项下方,现已调整到桌面歌词开关正下方,所有桌面歌词子选项聚拢成一组
-
-**新增功能**:
-
-- **桌面歌词行数设置**(设置 → 歌词 → 桌面歌词 → 歌词行数)
-  - 可选 1 行 / 2 行 / 3 行(默认 2 行)
-  - 1 行:仅显示当前行
-  - 2 行:当前行 + 下一行
-  - 3 行:上一行 + 当前行 + 下一行(更适合跟唱)
-
-- **桌面歌词锁屏显示开关**(设置 → 歌词 → 桌面歌词 → 锁屏显示,默认开)
-  - 开启:锁屏后桌面歌词仍悬浮显示
-  - 关闭:锁屏后桌面歌词隐藏(使用 WindowManager `FLAG_SHOW_WHEN_LOCKED` 控制)
-
-- **通知栏歌词锁屏显示开关**(设置 → 歌词 → 通知栏歌词 → 锁屏显示,默认开)
-  - 开启:锁屏后通知栏仍显示完整歌词内容(`VISIBILITY_PUBLIC`)
-  - 关闭:锁屏后通知栏隐藏歌词内容(`VISIBILITY_SECRET`)
-
-**修改文件**:
-- `app/src/main/res/xml/global_preferences.xml` — 重新排列顺序,新增 3 个偏好项
-- `app/src/main/res/values/strings.xml` — 新增 6 个字符串(行数 + 2 个锁屏)
-- `app/src/main/res/values/arrays.xml` — 新增 `desktop_lyrics_line_count` 数组
-- `app/src/main/res/layout/desktop_lyrics_overlay.xml` — 新增 `desktop_lyrics_prev` TextView
-- `app/src/main/java/.../util/Preferences.kt` — 新增 3 个偏好常量 + getter/setter
-- `app/src/main/java/.../service/DesktopLyricsOverlay.kt` — `show()` / `updateLyrics()` 改 4 行入参,新增锁屏 flag 处理
-- `app/src/main/java/.../service/NotificationHelper.kt` — `setVisibility()` 改为读取偏好
-- `app/src/tempo/.../service/MediaService.kt` — `DesktopLyricsOverlay.show()` 调用传 4 行
-- `app/build.gradle` — versionCode 28, versionName 3.9.0.5
+---
 
 ## Version 3.9.0.4
 
@@ -206,18 +142,9 @@ Tempo Mod 是基于原作者 CappielloAntonio 的 Tempo 3.9.0 版本进行二次
 - 设置 → 界面 → 通知栏歌词：默认关闭
 - 设置 → 界面 → 桌面歌词：默认关闭
 - 设置 → 界面 → 字体大小：小/中/大
-- 设置 → 界面 → 歌词颜色：白/黄/粉/蓝/绿/紫
+- 设置 → 界面 → 歌词颜色：白、黄、粉、蓝、绿、紫
 - 设置 → 界面 → 背景透明度：0-100%
 
 **技术实现**:
 - 使用 WindowManager + TYPE_APPLICATION_OVERLAY 悬浮窗
 - 需要 SYSTEM_ALERT_WINDOW 权限
-
----
-
-## Bug List
-
-### 桌面歌词开关点击闪退
-- 点击开启桌面歌词时，应用闪退而不是弹出权限请求通知
-- 需要权限: SYSTEM_ALERT_WINDOW
-- 状态: 待修复

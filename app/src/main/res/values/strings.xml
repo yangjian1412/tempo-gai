@@ -282,7 +282,11 @@
     <string name="settings_system_player_lyrics_title">系统播放器歌词</string>
     <string name="settings_system_player_lyrics_summary">将当前歌词行注入到系统媒体会话,锁屏、通知栏、灵动岛播放器可能显示</string>
     <string name="widget_description">歌词桌面小部件</string>
-    <string name="widget_label">Tempo 歌词</string>
+    <string name="widget_label">透明播放器</string>
+    <string name="widget_solid_description">不透明背景的歌词小部件</string>
+    <string name="widget_solid_label">纯色播放器</string>
+    <string name="widget_dynamic_description">跟随封面颜色 + 75% 透明的歌词小部件</string>
+    <string name="widget_dynamic_label">专辑色播放器</string>
     <string name="widget_no_track">未在播放</string>
     <string name="widget_no_artist">未知艺术家</string>
     <string name="widget_no_lyrics">~ 等待歌词 ~</string>
@@ -290,6 +294,8 @@
     <string name="widget_play_pause">播放/暂停</string>
     <string name="widget_next">下一首</string>
     <string name="widget_previous">上一首</string>
+    <string name="widget_shuffle">随机播放</string>
+    <string name="widget_repeat">循环模式</string>
     <string name="settings_audio_transcode_download_format">Transcode format</string>
     <string name="settings_audio_transcode_download_priority_summary">If enabled, Tempo will not force download the track with the transcode settings below.</string>
     <string name="settings_audio_transcode_download_priority_title">Prioritize server settings used for streaming in downloads</string>

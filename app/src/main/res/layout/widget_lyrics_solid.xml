@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="8dp"
-    android:background="@drawable/widget_background">
+    android:background="@drawable/widget_background_solid">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,7 +20,7 @@
             android:layout_height="60dp"
             android:layout_marginStart="2dp"
             android:scaleType="centerCrop"
-            android:background="@drawable/widget_album_background"
+            android:background="@drawable/widget_album_background_solid"
             android:src="@drawable/ic_placeholder_album"
             android:contentDescription="@string/widget_album_art" />
 
