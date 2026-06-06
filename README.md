@@ -45,7 +45,7 @@
   - 背景自适应系统主题
 
 <p align="center">
-  <img alt="桌面歌词" src="jpg/桌面歌词.jpg" width="500">
+  <img alt="桌面歌词" src="jpg/桌面歌词.jpg" width="250">
 </p>
 
 ### 2. 通知栏歌词
@@ -59,7 +59,7 @@
   - 暗色模式自动适配（`layout-night/`）
 
 <p align="center">
-  <img alt="系统歌词及通知栏歌词" src="jpg/系统歌词及通知栏歌词效果.jpg" width="500">
+  <img alt="系统歌词及通知栏歌词" src="jpg/系统歌词及通知栏歌词效果.jpg" width="250">
 </p>
 
 ### 3. 系统播放器歌词（灵动岛/锁屏）
@@ -94,13 +94,13 @@
 - 专辑封面用 Glide 异步加载，切歌时自动重载
 
 <p align="center">
-  <img alt="小部件 - 浅色" src="jpg/小部件-浅色.jpg" width="500">
+  <img alt="小部件 - 浅色" src="jpg/小部件-浅色.jpg" width="250">
 </p>
 <p align="center">
-  <img alt="小部件 - 深色" src="jpg/小部件-深色.jpg" width="500">
+  <img alt="小部件 - 深色" src="jpg/小部件-深色.jpg" width="250">
 </p>
 <p align="center">
-  <img alt="小部件效果" src="jpg/小部件效果.jpg" width="500">
+  <img alt="小部件效果" src="jpg/小部件效果.jpg" width="250">
 </p>
 
 ### 5. 设置项重构
@@ -109,24 +109,34 @@
 - **主从开关联动**：关闭主开关时子选项自动 disable
 
 <p align="center">
-  <img alt="设置页面" src="jpg/设置页面.jpg" width="500">
+  <img alt="设置页面" src="jpg/设置页面.jpg" width="250">
 </p>
 
 ---
 
 ## 🔧 技术细节
 
-| 改动 | 文件 | 说明 |
-|---|---|---|
-| 桌面歌词核心 | `app/src/main/java/com/cappielloantonio/tempo/service/DesktopLyricsOverlay.kt` | 悬浮窗 + 行数/对齐/透明度 |
-| 桌面歌词布局 | `app/src/main/res/layout/desktop_lyrics_overlay.xml` | 4 行歌词 |
-| 通知栏歌词 | `app/src/main/java/com/cappielloantonio/tempo/service/NotificationHelper.kt` | 字号 3 档 + 锁屏可见性 |
-| 通知栏布局 | `app/src/main/res/layout/notification_small.xml`、`layout-night/notification_small.xml` | 浅色/深色主题 |
-| 系统播放器歌词 | `app/src/tempo/java/com/cappielloantonio/tempo/service/MediaService.kt` | 注入歌词到 MediaSession |
-| 小部件 | `app/src/main/java/com/cappielloantonio/tempo/widget/` | 3 个 AppWidgetProvider + 刷新 + 点击 |
-| 小部件布局 | `app/src/main/res/layout/widget_lyrics*.xml` | 3 个变体布局 |
-| 设置项 | `app/src/main/res/xml/global_preferences.xml` | "歌词"分类 |
-| 中文化 | `app/src/main/res/values/strings.xml` | 翻译歌词相关设置说明 |
+<table>
+<colgroup>
+<col style="width: 30%">
+<col style="width: 45%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr><th align="left">改动</th><th align="left">文件</th><th align="left">说明</th></tr>
+</thead>
+<tbody>
+<tr><td>桌面歌词核心</td><td><code>app/src/main/java/com/cappielloantonio/tempo/service/DesktopLyricsOverlay.kt</code></td><td>悬浮窗 + 行数/对齐/透明度</td></tr>
+<tr><td>桌面歌词布局</td><td><code>app/src/main/res/layout/desktop_lyrics_overlay.xml</code></td><td>4 行歌词</td></tr>
+<tr><td>通知栏歌词</td><td><code>app/src/main/java/com/cappielloantonio/tempo/service/NotificationHelper.kt</code></td><td>字号 3 档 + 锁屏可见性</td></tr>
+<tr><td>通知栏布局</td><td><code>app/src/main/res/layout/notification_small.xml</code>、<code>layout-night/notification_small.xml</code></td><td>浅色/深色主题</td></tr>
+<tr><td>系统播放器歌词</td><td><code>app/src/tempo/java/com/cappielloantonio/tempo/service/MediaService.kt</code></td><td>注入歌词到 MediaSession</td></tr>
+<tr><td>小部件</td><td><code>app/src/main/java/com/cappielloantonio/tempo/widget/</code></td><td>3 个 AppWidgetProvider + 刷新 + 点击</td></tr>
+<tr><td>小部件布局</td><td><code>app/src/main/res/layout/widget_lyrics*.xml</code></td><td>3 个变体布局</td></tr>
+<tr><td>设置项</td><td><code>app/src/main/res/xml/global_preferences.xml</code></td><td>"歌词"分类</td></tr>
+<tr><td>中文化</td><td><code>app/src/main/res/values/strings.xml</code></td><td>翻译歌词相关设置说明</td></tr>
+</tbody>
+</table>
 
 ### 实现原理（系统播放器歌词）
 
