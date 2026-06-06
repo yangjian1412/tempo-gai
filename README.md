@@ -118,9 +118,9 @@
 
 <table>
 <colgroup>
-<col style="width: 30%">
-<col style="width: 45%">
-<col style="width: 25%">
+<col width="30%">
+<col width="45%">
+<col width="25%">
 </colgroup>
 <thead>
 <tr><th align="left">改动</th><th align="left">文件</th><th align="left">说明</th></tr>
