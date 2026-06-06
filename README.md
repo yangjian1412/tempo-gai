@@ -94,13 +94,9 @@
 - 专辑封面用 Glide 异步加载，切歌时自动重载
 
 <p align="center">
-  <img alt="小部件 - 浅色" src="jpg/小部件-浅色.jpg" width="250">
-</p>
-<p align="center">
-  <img alt="小部件 - 深色" src="jpg/小部件-深色.jpg" width="250">
-</p>
-<p align="center">
-  <img alt="小部件效果" src="jpg/小部件效果.jpg" width="250">
+  <img alt="小部件 - 浅色" src="jpg/小部件-浅色.jpg" width="280">
+  <img alt="小部件 - 深色" src="jpg/小部件-深色.jpg" width="280">
+  <img alt="小部件效果" src="jpg/小部件效果.jpg" width="280">
 </p>
 
 ### 5. 设置项重构
@@ -119,22 +115,22 @@
 <table>
 <colgroup>
 <col width="30%">
-<col width="45%">
-<col width="25%">
+<col width="35%">
+<col width="35%">
 </colgroup>
 <thead>
 <tr><th align="left">改动</th><th align="left">文件</th><th align="left">说明</th></tr>
 </thead>
 <tbody>
-<tr><td>桌面歌词核心</td><td><code>app/src/main/java/com/cappielloantonio/tempo/service/DesktopLyricsOverlay.kt</code></td><td>悬浮窗 + 行数/对齐/透明度</td></tr>
-<tr><td>桌面歌词布局</td><td><code>app/src/main/res/layout/desktop_lyrics_overlay.xml</code></td><td>4 行歌词</td></tr>
-<tr><td>通知栏歌词</td><td><code>app/src/main/java/com/cappielloantonio/tempo/service/NotificationHelper.kt</code></td><td>字号 3 档 + 锁屏可见性</td></tr>
-<tr><td>通知栏布局</td><td><code>app/src/main/res/layout/notification_small.xml</code>、<code>layout-night/notification_small.xml</code></td><td>浅色/深色主题</td></tr>
-<tr><td>系统播放器歌词</td><td><code>app/src/tempo/java/com/cappielloantonio/tempo/service/MediaService.kt</code></td><td>注入歌词到 MediaSession</td></tr>
-<tr><td>小部件</td><td><code>app/src/main/java/com/cappielloantonio/tempo/widget/</code></td><td>3 个 AppWidgetProvider + 刷新 + 点击</td></tr>
-<tr><td>小部件布局</td><td><code>app/src/main/res/layout/widget_lyrics*.xml</code></td><td>3 个变体布局</td></tr>
-<tr><td>设置项</td><td><code>app/src/main/res/xml/global_preferences.xml</code></td><td>"歌词"分类</td></tr>
-<tr><td>中文化</td><td><code>app/src/main/res/values/strings.xml</code></td><td>翻译歌词相关设置说明</td></tr>
+<tr><td>桌面歌词核心</td><td><code>DesktopLyricsOverlay.kt</code></td><td>悬浮窗 + 行数/对齐/透明度</td></tr>
+<tr><td>桌面歌词布局</td><td><code>desktop_lyrics_overlay.xml</code></td><td>4 行歌词</td></tr>
+<tr><td>通知栏歌词</td><td><code>NotificationHelper.kt</code></td><td>字号 3 档 + 锁屏可见性</td></tr>
+<tr><td>通知栏布局</td><td><code>notification_small.xml</code>（+ night）</td><td>浅色/深色主题</td></tr>
+<tr><td>系统播放器歌词</td><td><code>MediaService.kt</code></td><td>注入歌词到 MediaSession</td></tr>
+<tr><td>小部件</td><td><code>widget/*Provider.kt</code></td><td>3 个 AppWidgetProvider + 刷新 + 点击</td></tr>
+<tr><td>小部件布局</td><td><code>widget_lyrics*.xml</code></td><td>3 个变体布局</td></tr>
+<tr><td>设置项</td><td><code>global_preferences.xml</code></td><td>"歌词"分类</td></tr>
+<tr><td>中文化</td><td><code>strings.xml</code></td><td>翻译歌词相关设置说明</td></tr>
 </tbody>
 </table>
 
