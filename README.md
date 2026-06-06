@@ -94,9 +94,9 @@
 - 专辑封面用 Glide 异步加载，切歌时自动重载
 
 <p align="center">
-  <img alt="小部件 - 浅色" src="jpg/小部件-浅色.jpg" width="280">
-  <img alt="小部件 - 深色" src="jpg/小部件-深色.jpg" width="280">
-  <img alt="小部件效果" src="jpg/小部件效果.jpg" width="280">
+  <img alt="小部件 - 浅色" src="jpg/小部件-浅色.jpg" width="220">
+  <img alt="小部件 - 深色" src="jpg/小部件-深色.jpg" width="220">
+  <img alt="小部件效果" src="jpg/小部件效果.jpg" width="220">
 </p>
 
 ### 5. 设置项重构
