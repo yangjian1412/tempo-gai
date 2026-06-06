@@ -198,6 +198,7 @@ player.replaceMediaItem(
 - **原作者**：[Antonio Cappiello](https://github.com/CappielloAntonio) — 创建并维护了 Tempo 这个优秀的 Subsonic 客户端
 - **参考实现**：[椒盐音乐（Salt Player）](https://github.com/Moriafly/SaltPlayerSource) 的 `MediaPlayerWrapper.onMetadataChanged` 给我提供了"通过 title 注入歌词到系统 MediaSession"的思路
 - **MiPlay SDK**：小米 HyperOS 灵动岛/锁屏歌词显示依赖 `Cir_Miplay_MetaInfoManager` 服务
+- **Minimax & opencode**：改版过程中所有代码均由opencode+minimax生成封装
 
 ---
 
