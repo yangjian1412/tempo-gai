@@ -9,10 +9,10 @@ import com.cappielloantonio.tempo.R;
 import com.cappielloantonio.tempo.model.HomeSector;
 import com.cappielloantonio.tempo.util.Constants;
 import com.cappielloantonio.tempo.util.Preferences;
-import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class HomeRearrangementViewModel extends AndroidViewModel {
@@ -26,11 +26,13 @@ public class HomeRearrangementViewModel extends AndroidViewModel {
         if (sectors != null && !sectors.isEmpty()) return sectors;
 
         if (Preferences.getHomeSectorList() != null && !Preferences.getHomeSectorList().equals("null")) {
-            sectors = new Gson().fromJson(
+            HomeSector[] array = new Gson().fromJson(
                     Preferences.getHomeSectorList(),
-                    new TypeToken<List<HomeSector>>() {
-                    }.getType()
+                    HomeSector[].class
             );
+            if (array != null) {
+                sectors = Arrays.asList(array);
+            }
         } else {
             sectors = fillStandardHomeSectorList();
         }

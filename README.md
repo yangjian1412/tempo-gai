@@ -11,7 +11,7 @@
 >
 > 感慨完了，以下内容均为ai生成了，其实，我也不知道他描述的功能对不对。
 
-# Tempo Mod 3.9.0.5
+# Tempo Mod 3.9.0.6
 
 > ⚠️ **本项目是基于 [CappielloAntonio/tempo](https://github.com/CappielloAntonio/tempo) 3.9.0 的修改版本（Mod）**
 >
@@ -164,7 +164,7 @@ player.replaceMediaItem(
 
 ### 下载
 
-前往 [Releases](https://github.com/yangjian1412/tempo-gai/releases) 页面下载 `tempo-mod-3.9.0.5-debug.apk`。
+前往 [Releases](https://github.com/yangjian1412/tempo-gai/releases) 页面下载 `tempo-mod-3.9.0.6-release.apk`。
 
 ### 系统要求
 
@@ -175,7 +175,7 @@ player.replaceMediaItem(
 
 ### 安装步骤
 
-1. 下载 `tempo-mod-3.9.0.5-debug.apk`
+1. 下载 `tempo-mod-3.9.0.6-release.apk`
 2. 手机上开启"未知来源应用"权限
 3. 点击 APK 安装
 4. 首次启动会提示授予存储/通知权限
@@ -215,5 +215,6 @@ player.replaceMediaItem(
 
 | 版本 | 日期 | 说明 |
 |---|---|---|
+| 3.9.0.6 | 2026-07-24 | 修复 R8 混淆闪退 + 歌词时间戳被覆盖 + PlayerLyricsFragment 泄漏 |
 | 3.9.0.5 | 2026-06-06 | 桌面歌词/通知栏歌词强化 + 3 个 Android 桌面小部件 |
 | 3.9.0.4 | 2026-05-30 | 系统播放器歌词（MediaSession 注入） + 桌面歌词闪退 Bug 修复 |

@@ -131,6 +131,7 @@ public class LoginFragment extends Fragment implements ClickCallback {
             @Override
             public void onSuccess(String password, String token, String salt) {
                 activity.goFromLogin();
+                activity.getOpenSubsonicExtensions();
             }
         });
     }

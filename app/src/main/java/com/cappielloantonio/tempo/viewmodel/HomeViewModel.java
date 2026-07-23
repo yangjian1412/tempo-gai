@@ -25,10 +25,10 @@ import com.cappielloantonio.tempo.subsonic.models.Child;
 import com.cappielloantonio.tempo.subsonic.models.Playlist;
 import com.cappielloantonio.tempo.subsonic.models.Share;
 import com.cappielloantonio.tempo.util.Preferences;
-import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -331,11 +331,13 @@ public class HomeViewModel extends AndroidViewModel {
 
     private void setHomeSectorList() {
         if (Preferences.getHomeSectorList() != null && !Preferences.getHomeSectorList().equals("null")) {
-            sectors = new Gson().fromJson(
+            HomeSector[] array = new Gson().fromJson(
                     Preferences.getHomeSectorList(),
-                    new TypeToken<List<HomeSector>>() {
-                    }.getType()
+                    HomeSector[].class
             );
+            if (array != null) {
+                sectors = Arrays.asList(array);
+            }
         }
     }
 

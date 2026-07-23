@@ -10,8 +10,8 @@ android {
         minSdkVersion 24
         targetSdk 35
 
-        versionCode 28
-        versionName '3.9.0.5'
+        versionCode 29
+        versionName '3.9.0.6'
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
@@ -42,6 +42,26 @@ android {
             dimension = "default"
             applicationId "com.cappielloantonio.play.tempo"
         }
+
+        tv {
+            dimension = "default"
+            applicationId "com.cappielloantonio.tempo.tv"
+            minSdkVersion 21
+        }
+    }
+
+    signingConfigs {
+        release {
+            def props = new Properties()
+            def propsFile = rootProject.file('app/keystore.properties')
+            if (propsFile.exists()) {
+                props.load(new FileInputStream(propsFile))
+                storeFile file(props['storeFile'])
+                storePassword props['storePassword']
+                keyAlias props['keyAlias']
+                keyPassword props['keyPassword']
+            }
+        }
     }
 
     buildTypes {
@@ -49,7 +69,7 @@ android {
             shrinkResources true
             minifyEnabled true
             debuggable false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 
@@ -107,4 +127,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.11.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.14'
     implementation 'com.squareup.retrofit2:converter-gson:2.11.0'
+
+    // TV (Leanback)
+    tvImplementation 'androidx.leanback:leanback:1.0.0'
 }

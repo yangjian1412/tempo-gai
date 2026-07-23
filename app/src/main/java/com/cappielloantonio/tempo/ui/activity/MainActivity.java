@@ -89,6 +89,7 @@ public class MainActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         pingServer();
+        getOpenSubsonicExtensions();
     }
 
     @Override
@@ -114,6 +115,7 @@ public class MainActivity extends BaseActivity {
 
         if (Preferences.getPassword() != null || (Preferences.getToken() != null && Preferences.getSalt() != null)) {
             goFromLogin();
+            getOpenSubsonicExtensions();
         } else {
             goToLogin();
         }
@@ -375,7 +377,7 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private void getOpenSubsonicExtensions() {
+    public void getOpenSubsonicExtensions() {
         if (Preferences.getToken() != null) {
             mainViewModel.getOpenSubsonicExtensions().observe(this, openSubsonicExtensions -> {
                 if (openSubsonicExtensions != null) {

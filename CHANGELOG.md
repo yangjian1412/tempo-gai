@@ -31,7 +31,21 @@
 
 ---
 
-## Version 3.9.0.5 (开发中)
+## Version 3.9.0.6
+
+**日期**: 2026-07-24
+
+**概述**:
+修复 R8 混淆闪退 + 歌词时间戳被覆盖 + PlayerLyricsFragment 泄漏。
+
+**Bug 修复**:
+- **R8 混淆闪退**：三处 `TypeToken<List<T>>(){}` 匿名子类改为 `Gson().fromJson(json, T[].class)` + `Arrays.asList()`，解决 R8 抹掉泛型 Signature 导致的 `IllegalArgumentException`
+- **歌词时间戳被覆盖**：`refreshMediaInfo` 改为始终优先调用 `getLyricsBySongId`（OpenSubsonic songLyrics 扩展），仅在失败时回退 `getSongLyrics`；`PlayerControllerFragment` + `PlayerBottomSheetViewModel.setLiveMedia()` 双重复调用去重，防止旧接口覆盖新接口结果
+- **歌词显示异常**：`PlayerLyricsFragment.setPanelContent` 改为 `applyPanelContent`，`getLiveDescription()` observer 移到 `initPanelContent`，消除每次调用都注册新观察者的泄漏
+
+---
+
+## Version 3.9.0.5
 
 **基于版本**: Tempo 3.9.0.4 (本 Mod 上一版)
 

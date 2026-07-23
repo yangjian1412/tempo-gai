@@ -19,3 +19,7 @@ app-tempo-debug-backup.apk
 *.apk
 app/build/
 **/build/
+
+# Release signing
+*.jks
+keystore.properties

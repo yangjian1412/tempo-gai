@@ -53,6 +53,7 @@ public class PlayerBottomSheetViewModel extends AndroidViewModel {
     private final MutableLiveData<Child> liveMedia = new MutableLiveData<>(null);
     private final MutableLiveData<AlbumID3> liveAlbum = new MutableLiveData<>(null);
     private final MutableLiveData<ArtistID3> liveArtist = new MutableLiveData<>(null);
+    private String currentMediaId;
     private final MutableLiveData<List<Child>> instantMix = new MutableLiveData<>(null);
     private boolean lyricsSyncState = true;
 
@@ -140,13 +141,20 @@ public class PlayerBottomSheetViewModel extends AndroidViewModel {
     }
 
     public void refreshMediaInfo(LifecycleOwner owner, Child media) {
-        if (OpenSubsonicExtensionsUtil.isSongLyricsExtensionAvailable()) {
-            openRepository.getLyricsBySongId(media.getId()).observe(owner, lyricsListLiveData::postValue);
-            lyricsLiveData.postValue(null);
-        } else {
-            songRepository.getSongLyrics(media).observe(owner, lyricsLiveData::postValue);
-            lyricsListLiveData.postValue(null);
-        }
+        lyricsListLiveData.postValue(null);
+        lyricsLiveData.postValue(null);
+
+        openRepository.getLyricsBySongId(media.getId(), new OpenRepository.LyricsCallback() {
+            @Override
+            public void onSuccess(LyricsList lyricsList) {
+                lyricsListLiveData.postValue(lyricsList);
+            }
+
+            @Override
+            public void onFailure() {
+                songRepository.getSongLyrics(media).observe(owner, lyricsLiveData::postValue);
+            }
+        });
     }
 
     public LiveData<Child> getLiveMedia() {
@@ -154,6 +162,9 @@ public class PlayerBottomSheetViewModel extends AndroidViewModel {
     }
 
     public void setLiveMedia(LifecycleOwner owner, String mediaType, String mediaId) {
+        if (mediaId != null && mediaId.equals(currentMediaId)) return;
+        currentMediaId = mediaId;
+
         if (mediaType != null) {
             switch (mediaType) {
                 case Constants.MEDIA_TYPE_MUSIC:

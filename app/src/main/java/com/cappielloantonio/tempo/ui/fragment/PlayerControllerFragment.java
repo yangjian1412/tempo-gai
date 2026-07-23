@@ -63,6 +63,7 @@ public class PlayerControllerFragment extends Fragment {
     private MainActivity activity;
     private PlayerBottomSheetViewModel playerBottomSheetViewModel;
     private ListenableFuture<MediaBrowser> mediaBrowserListenableFuture;
+    private String lastMediaId;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -281,6 +282,9 @@ public class PlayerControllerFragment extends Fragment {
     private void initMediaListenable() {
         playerBottomSheetViewModel.getLiveMedia().observe(getViewLifecycleOwner(), media -> {
             if (media != null) {
+                if (media.getId().equals(lastMediaId)) return;
+                lastMediaId = media.getId();
+
                 buttonFavorite.setChecked(media.getStarred() != null);
                 buttonFavorite.setOnClickListener(v -> playerBottomSheetViewModel.setFavorite(requireContext(), media));
                 buttonFavorite.setOnLongClickListener(v -> {
@@ -296,16 +300,16 @@ public class PlayerControllerFragment extends Fragment {
 
                 if (getActivity() != null) {
                     playerBottomSheetViewModel.refreshMediaInfo(requireActivity(), media);
-
-                    playerBottomSheetViewModel.getLiveLyricsList().observe(getViewLifecycleOwner(), lyricsList -> {
-                        MediaService.updateLyrics(null, lyricsList);
-                    });
-
-                    playerBottomSheetViewModel.getLiveLyrics().observe(getViewLifecycleOwner(), lyrics -> {
-                        MediaService.updateLyrics(lyrics, null);
-                    });
                 }
             }
+        });
+
+        playerBottomSheetViewModel.getLiveLyricsList().observe(getViewLifecycleOwner(), lyricsList -> {
+            MediaService.updateLyrics(null, lyricsList);
+        });
+
+        playerBottomSheetViewModel.getLiveLyrics().observe(getViewLifecycleOwner(), lyrics -> {
+            MediaService.updateLyrics(lyrics, null);
         });
     }
 

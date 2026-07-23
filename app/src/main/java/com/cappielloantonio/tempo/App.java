@@ -14,11 +14,11 @@ import com.cappielloantonio.tempo.subsonic.SubsonicPreferences;
 import com.cappielloantonio.tempo.util.Preferences;
 
 public class App extends Application {
-    private static App instance;
-    private static Context context;
-    private static Subsonic subsonic;
-    private static Github github;
-    private static SharedPreferences preferences;
+    static App instance;
+    static Context context;
+    static Subsonic subsonic;
+    static Github github;
+    static SharedPreferences preferences;
 
     @Override
     public void onCreate() {

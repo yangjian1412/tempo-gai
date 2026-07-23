@@ -1,24 +1,35 @@
 package com.cappielloantonio.tempo.util;
 
 import com.cappielloantonio.tempo.subsonic.models.OpenSubsonicExtension;
-import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class OpenSubsonicExtensionsUtil {
-    private static List<OpenSubsonicExtension> getOpenSubsonicExtensions() {
-        List<OpenSubsonicExtension> extensions = null;
+    public static void resetCache() {
+        cachedExtensions = null;
+    }
 
-        if (Preferences.isOpenSubsonic() && Preferences.getOpenSubsonicExtensions() != null) {
-            extensions = new Gson().fromJson(
-                    Preferences.getOpenSubsonicExtensions(),
-                    new TypeToken<List<OpenSubsonicExtension>>() {
-                    }.getType()
-            );
+    private static List<OpenSubsonicExtension> cachedExtensions = null;
+
+    private static List<OpenSubsonicExtension> getOpenSubsonicExtensions() {
+        if (cachedExtensions != null) return cachedExtensions;
+
+        if (Preferences.getOpenSubsonicExtensions() != null) {
+            try {
+                OpenSubsonicExtension[] array = new Gson().fromJson(
+                        Preferences.getOpenSubsonicExtensions(),
+                        OpenSubsonicExtension[].class
+                );
+                if (array != null) {
+                    cachedExtensions = Arrays.asList(array);
+                }
+            } catch (Exception ignored) {
+            }
         }
 
-        return extensions;
+        return cachedExtensions;
     }
 
     private static OpenSubsonicExtension getOpenSubsonicExtension(String extensionName) {

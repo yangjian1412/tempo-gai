@@ -128,49 +128,56 @@ public class PlayerLyricsFragment extends Fragment {
         }, MoreExecutors.directExecutor());
     }
 
+    private String lastLyrics;
+    private LyricsList lastLyricsList;
+
     private void initPanelContent() {
-        if (OpenSubsonicExtensionsUtil.isSongLyricsExtensionAvailable()) {
-            playerBottomSheetViewModel.getLiveLyricsList().observe(getViewLifecycleOwner(), lyricsList -> {
-                setPanelContent(null, lyricsList);
-            });
-        } else {
-            playerBottomSheetViewModel.getLiveLyrics().observe(getViewLifecycleOwner(), lyrics -> {
-                setPanelContent(lyrics, null);
-            });
-        }
+        playerBottomSheetViewModel.getLiveDescription().observe(getViewLifecycleOwner(), description -> {
+            applyPanelContent(description);
+        });
+
+        playerBottomSheetViewModel.getLiveLyricsList().observe(getViewLifecycleOwner(), lyricsList -> {
+            lastLyricsList = lyricsList;
+            applyPanelContent(null);
+        });
+
+        playerBottomSheetViewModel.getLiveLyrics().observe(getViewLifecycleOwner(), lyrics -> {
+            lastLyrics = lyrics;
+            applyPanelContent(null);
+        });
     }
 
-    private void setPanelContent(String lyrics, LyricsList lyricsList) {
-        playerBottomSheetViewModel.getLiveDescription().observe(getViewLifecycleOwner(), description -> {
-            if (bind != null) {
-                bind.nowPlayingSongLyricsSrollView.smoothScrollTo(0, 0);
+    private void applyPanelContent(String descriptionOverride) {
+        if (bind == null) return;
+        bind.nowPlayingSongLyricsSrollView.smoothScrollTo(0, 0);
 
-                if (lyrics != null && !lyrics.trim().equals("")) {
-                    bind.nowPlayingSongLyricsTextView.setText(MusicUtil.getReadableLyrics(lyrics));
-                    bind.nowPlayingSongLyricsTextView.setVisibility(View.VISIBLE);
-                    bind.emptyDescriptionImageView.setVisibility(View.GONE);
-                    bind.titleEmptyDescriptionLabel.setVisibility(View.GONE);
-                    bind.syncLyricsTapButton.setVisibility(View.GONE);
-                } else if (lyricsList != null && lyricsList.getStructuredLyrics() != null) {
-                    setSyncLirics(lyricsList);
-                    bind.nowPlayingSongLyricsTextView.setVisibility(View.VISIBLE);
-                    bind.emptyDescriptionImageView.setVisibility(View.GONE);
-                    bind.titleEmptyDescriptionLabel.setVisibility(View.GONE);
-                    bind.syncLyricsTapButton.setVisibility(View.VISIBLE);
-                } else if (description != null && !description.trim().equals("")) {
-                    bind.nowPlayingSongLyricsTextView.setText(MusicUtil.getReadableLyrics(description));
-                    bind.nowPlayingSongLyricsTextView.setVisibility(View.VISIBLE);
-                    bind.emptyDescriptionImageView.setVisibility(View.GONE);
-                    bind.titleEmptyDescriptionLabel.setVisibility(View.GONE);
-                    bind.syncLyricsTapButton.setVisibility(View.GONE);
-                } else {
-                    bind.nowPlayingSongLyricsTextView.setVisibility(View.GONE);
-                    bind.emptyDescriptionImageView.setVisibility(View.VISIBLE);
-                    bind.titleEmptyDescriptionLabel.setVisibility(View.VISIBLE);
-                    bind.syncLyricsTapButton.setVisibility(View.GONE);
-                }
+        if (lastLyricsList != null && lastLyricsList.getStructuredLyrics() != null) {
+            setSyncLirics(lastLyricsList);
+            bind.nowPlayingSongLyricsTextView.setVisibility(View.VISIBLE);
+            bind.emptyDescriptionImageView.setVisibility(View.GONE);
+            bind.titleEmptyDescriptionLabel.setVisibility(View.GONE);
+            bind.syncLyricsTapButton.setVisibility(View.VISIBLE);
+        } else if (lastLyrics != null && !lastLyrics.trim().equals("")) {
+            bind.nowPlayingSongLyricsTextView.setText(MusicUtil.getReadableLyrics(lastLyrics));
+            bind.nowPlayingSongLyricsTextView.setVisibility(View.VISIBLE);
+            bind.emptyDescriptionImageView.setVisibility(View.GONE);
+            bind.titleEmptyDescriptionLabel.setVisibility(View.GONE);
+            bind.syncLyricsTapButton.setVisibility(View.GONE);
+        } else {
+            String description = descriptionOverride != null ? descriptionOverride : playerBottomSheetViewModel.getLiveDescription().getValue();
+            if (description != null && !description.trim().equals("")) {
+                bind.nowPlayingSongLyricsTextView.setText(MusicUtil.getReadableLyrics(description));
+                bind.nowPlayingSongLyricsTextView.setVisibility(View.VISIBLE);
+                bind.emptyDescriptionImageView.setVisibility(View.GONE);
+                bind.titleEmptyDescriptionLabel.setVisibility(View.GONE);
+                bind.syncLyricsTapButton.setVisibility(View.GONE);
+            } else {
+                bind.nowPlayingSongLyricsTextView.setVisibility(View.GONE);
+                bind.emptyDescriptionImageView.setVisibility(View.VISIBLE);
+                bind.titleEmptyDescriptionLabel.setVisibility(View.VISIBLE);
+                bind.syncLyricsTapButton.setVisibility(View.GONE);
             }
-        });
+        }
     }
 
     @SuppressLint("DefaultLocale")
